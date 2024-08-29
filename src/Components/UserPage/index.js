@@ -99,8 +99,8 @@ const UserPage =() =>{
                
 
                <div className="rightSectionBottomContainer">
-               <div style={{ marginTop:'0px'}}>
-      <h2>Data from Mic:</h2>
+               <div style={{ marginTop:'0px'}}> 
+      <h2>Data from Mic:</h2> 
     <div style={{border:"1px solid red", padding:'10px', minHeight:'150px', fontSize:"18px"}}> {dataFromDatabaseMic}</div>
       <h2>Data from Chat</h2>
     <div style={{border:"1px solid red", padding:'10px', minHeight:'400px', fontSize:"18px"}} dangerouslySetInnerHTML={{ __html: dataFromDatabase }}/>
