@@ -58,7 +58,7 @@ const UserPage =() =>{
         <div className="mainBackgroundContainer">
             <div className='rightSectionContainer' style={{marginTop:"-50px"}}>
               
-              <div className="mobileUserInfoContainer">
+              {/* <div className="mobileUserInfoContainer">
                  <div className="mobileeachuserInfocont">
                         <p className="mobileuserPageUserInfo">Company Name :&nbsp;</p>
                         <span> <strong> {userDataInfo.companyName}</strong></span>
@@ -95,16 +95,17 @@ const UserPage =() =>{
 
                 
                
-              </div>
+              </div> */}
                
 
                <div className="rightSectionBottomContainer">
                <div style={{ marginTop:'0px'}}> 
       <h2>Data from Mic:</h2> 
-    <div style={{border:"1px solid red", padding:'10px', minHeight:'150px', fontSize:"18px"}}> {dataFromDatabaseMic}</div>
+    <div style={{border:"1px solid red", padding:'10px', minHeight:'150px',fontSize:"18px"}}> {dataFromDatabaseMic}</div>
       <h2>Data from Chat</h2>
-    <div style={{border:"1px solid red", padding:'10px', minHeight:'400px', fontSize:"18px"}} dangerouslySetInnerHTML={{ __html: dataFromDatabase }}/>
+    <div style={{border:"1px solid red", padding:'10px', minHeight:'350px', fontSize:"18px"}} dangerouslySetInnerHTML={{ __html: dataFromDatabase }}/>
     </div>
+
                   {/* <textarea placeholder="Mic" type="text" className='topInputContainer' />
                   
                   <textarea value={dataFromDatabase} placeholder="Chat" type="text" className='bottomInputContainer' /> */}

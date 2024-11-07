@@ -2415,7 +2415,127 @@ const MainPage =() =>{
             <li><strong>CSS Grid:</strong> Complex layouts, grid-based designs, magazine-style layouts.</li>
             <li><strong>Flexbox:</strong> Navigation menus, sidebars, flexible content containers, centering elements.</li>
           </ul>`
+        },{
+          command:"Selection Sort Implementation",
+          text:`
+          <p><strong>Selection Sort:</strong> Selection Sort is a sorting algorithm. It works by selecting the smallest (or largest) element from given array and swapping it with the element at the current position.</p>
+        <p><strong>Time Complexity:</strong></p>
+        <ul>
+            <li><strong>Best, Worst, and Average Case:</strong> O(n²), where n is the number of elements.</li>
+            <li><strong>Space Complexity:</strong> O(1) because it sorts the array in-place with no extra space required.</li>
+        </ul>
+       <pre style="font-size: 10px;">
+    <code>
+function selectionSort(arr) {
+    for (let i = 0; i < arr.length - 1; i++) {
+        let minIndex = i;
+        for (let j = i + 1; j < arr.length; j++) {
+            if (arr[j] < arr[minIndex]) {
+                minIndex = j;
+            }
         }
+        [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
+    }
+    return arr;
+}
+
+// Example usage:
+const arr = [55, 20, 10,28, 18];
+console.log(selectionSort(arr));
+// Output: [10,18,20, 28, 55]
+    </code>
+</pre>
+
+          `
+        },{
+  command: "Bubble Sort Implementation",
+  text: `
+      <p><strong>Bubble Sort:</strong> Bubble Sort is a simple sorting algorithm,it pushes the maximum element to the last by adjacent swaps.</p>
+      <p><strong>Optimization:</strong> In the optimized version of Bubble Sort, we can stop early if no elements were swapped,indicating that the list is already sorted.</p>
+      <p><strong>Time Complexity:</strong></p>
+      <ul>
+          <li><strong>Best Case:</strong> O(n) – When the array is already sorted, only one pass is needed.</li>
+          <li><strong>Average and Worst Case:</strong> O(n²) – In the case of a completely unsorted array.</li>
+      </ul>
+      <pre style="font-size: 14px;">
+          <code>
+function bubbleSort(arr) {
+  let n = arr.length;
+  let swapped;
+
+  for (let i = 0; i < n - 1; i++) {
+      swapped = false;
+
+      // Inner loop: Traverse the array from 0 to n-i-1
+      // Last i elements are already sorted
+
+      for (let j = 0; j < n - i - 1; j++) {
+          if (arr[j] > arr[j + 1]) {
+              // Swap if the element is greater than the next element
+              [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+
+              swapped = true; // Mark that a swap has occurred
+          }
+      }
+
+      if (!swapped) {
+          break; 
+      }
+  }
+
+  return arr;
+}
+
+// Example usage:
+const arr = [55, 20, 10,28, 18];
+console.log(bubbleSort(arr));
+// Output: [10,18,20, 28, 55]
+          </code>
+      </pre>
+  `
+},{
+  command: "Insertion Sort Implementation",
+  text: `
+      <p><strong>Insertion Sort:</strong> Insertion Sort is a sorting algorithm it going to pick an element and kept at right position by swaping.</p>
+      <p><strong>Why is Insertion Sort Efficient for Almost Sorted Arrays?</strong></p>
+      <ul>
+          <li><strong>Efficient for nearly sorted arrays:</strong>Only outer loop was iterate once,while loop doesnt exceute.</li>
+          <li><strong>Best Case (already sorted):</strong> O(n) because no shifts or swaps are needed.</li>
+          <li><strong>Worst Case (reversely sorted):</strong> O(n²) because every element must be compared and shifted.</li>
+      </ul>
+      <pre style="font-size: 14px;margin-right:100px;">
+          <code>
+function insertionSort(arr) {
+    let n = arr.length;
+     
+    for (let i = 1; i < n; i++) {
+        let j = i;
+
+        // checking is any prev ele is greater
+        // than present ele
+        while (j > 0 && arr[j - 1] > arr[j]) {
+            // Swap prev and present ele
+            let temp = arr[j - 1];
+            arr[j - 1] = arr[j];
+            arr[j] = temp;
+
+            // Move to previous index
+            j--;
+        }
+    }
+
+    return arr;
+}
+
+// Example usage:
+let arr = [12, 11, 13, 5, 6];
+insertionSort(arr); 
+// Output:[5,6,11,12,13]
+            </code>
+      </pre>
+  `
+}
+
       ];
     
     
