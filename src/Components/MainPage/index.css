@@ -65,7 +65,7 @@
     display: flex;
     align-items: center;
     margin-bottom:10px;
-
+    position: relative;
   }
   
 .search-input {
@@ -73,8 +73,11 @@
     outline: none;
     border: 1px solid #909090;
     line-height:15px;
-    width:95%;
+    width:98%;
+    /* position:fixed;
+    top:20px; */
 }
+
 
   
 .search-input::placeholder {
@@ -126,9 +129,10 @@ details{
 }
 @media screen and (max-width:768px){
     .mainPrightSectionTopBar{
-        justify-content:space-between;
+        /* justify-content:space-between;
         padding-left:20px;
-        padding-right:20px;
+        padding-right:20px; */
+        display:none;
     }
 }
 .signoutButton{
@@ -190,7 +194,8 @@ details{
     color:black;
 }
 .startButton{
-    background-color:green;
+    background-color:red;
+    
 }
 .generate{
     background-color: black;
@@ -290,7 +295,7 @@ details{
 }
 
 .stopButton{
-    background-color:red;
+    background-color:green;
 }
 .resetButton{
     background-color:blue;
@@ -323,19 +328,15 @@ details{
     align-items:center;
     margin-right:14px;
 }
-.MobileCommandsContainer{
-    border:1px solid #B2BEB5;
-    padding:13px;
-    width:95%;
-    margin-top:0px;
-    margin-bottom:10px;
 
+.search-container-mobile{
+    display: flex;
+    align-items: center;
+    width:100%;
 }
-@media screen and (min-width:768px){
-    .MobileCommandsContainer{
-        display:none;
-    }
-}
+
+
+
 .addCommandContainer{
     display: flex;
     justify-content:flex-end; /* Center the button horizontally */
@@ -595,4 +596,26 @@ details{
     font-family: "Bree serif";
     font-size:25px;
     margin-left:30px;
+}
+
+
+
+
+.questions{
+    overflow-y: scroll;
+    flex-grow:1;
+    margin-top:2px;
+    margin-bottom:0px;
+}
+
+.MobileCommandsContainer{
+    border:1px solid #B2BEB5;
+    padding:13px;
+    width:95%;
+    margin-top:0px;
+}
+@media screen and (min-width:768px){
+    .MobileCommandsContainer{
+        display:none !important;
+    }
 }

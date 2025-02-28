@@ -1,39 +1,32 @@
-import { useNavigate } from 'react-router-dom';
-import { useState,useEffect } from 'react';
-import {BsSearch} from 'react-icons/bs'
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { BsSearch } from "react-icons/bs";
 import axios from "axios";
-import "./index.css"
+import "./index.css";
 import { MdPerson } from "react-icons/md";
 import { ref, set } from "firebase/database";
-import { database } from '../../Firebase'; 
+import { database } from "../../Firebase";
 import SpeechRecognition, {
-    useSpeechRecognition
-  } from "react-speech-recognition";
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
-const MainPage =() =>{
-    const userId = localStorage.getItem('userInfo');
-    const [searchInput, setSearchInput] = useState('');
-    const navigate = useNavigate();
-    const [userName,setuserName] = useState('')
-    const [chatInput, setChatInput] = useState('');
-    const [text, setText] = useState("");
-    const [genPopUp, setGenPopUp] = useState(false)
-    const [userLink, setUserLink] = useState('')
-    const [linkCopied, setLinkCopied] = useState(false)
-    const [isOpen, setIsOpen] = useState(false);
+const MainPage = () => {
+  const userId = localStorage.getItem("userInfo");
+  const [searchInput, setSearchInput] = useState("");
+  const navigate = useNavigate();
+  const [userName, setuserName] = useState("");
+  const [genPopUp, setGenPopUp] = useState(false);
+  const [userLink, setUserLink] = useState("");
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-      const [newCommand, setNewCommand] = useState('');
-    const [newAnswer, setNewAnswer] = useState('');
+  const [buttonsPopUp, setButtonsPopUp] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
-    const [buttonsPopUp,setButtonsPopUp] = useState(false)
-    const [isRecording, setIsRecording] = useState(false);
-
-
-
-    const commandss = [
-        {
-            command: "Introduction",
-            text: `<p>Hello! My name is [Your Name], and I'm excited to interview for the front-end developer position.</p>
+  const commandss = [
+    {
+      command: "Introduction",
+      text: `<p>Hello! My name is [Your Name], and I'm excited to interview for the front-end developer position.</p>
     
             <p>For the past five years, I've been dedicated to crafting user-friendly and visually appealing web applications as a front-end developer. My primary focus has been on utilizing React.js to build interactive and dynamic user interfaces.</p>
             
@@ -46,11 +39,11 @@ const MainPage =() =>{
             <p>I'm passionate about creating intuitive and user-friendly interfaces that enhance the overall user experience. I thrive in environments that foster creativity, collaboration, and continuous learning.</p>
             
             <p>I'm looking forward to discussing how my skills and experience can contribute to the success of your team and projects. Thank you for considering my application!</p>
-         `
-        },
-        {
-            command:"HTML5 Features",
-            text: `
+         `,
+    },
+    {
+      command: "HTML5 Features",
+      text: `
             <ol>
               <li><strong>Semantics:</strong> HTML5 introduced new semantic elements like &lt;header&gt;, &lt;footer&gt;, &lt;nav&gt;, &lt;article&gt;, &lt;section&gt;, &lt;aside&gt;, etc., which provide better structure and meaning to web pages.</li>
               <li><strong>Audio and Video Support:</strong> HTML5 includes native support for embedding audio and video content using the &lt;audio&gt; and &lt;video&gt; elements.</li>
@@ -63,11 +56,11 @@ const MainPage =() =>{
               <li><strong>Responsive Images:</strong> HTML5 introduced the &lt;picture&gt; and &lt;source&gt; elements for providing multiple image sources and specifying different image resolutions based on device characteristics.</li>
               <li><strong>Improved Accessibility:</strong> HTML5 includes features aimed at improving web accessibility, such as native support for ARIA attributes and landmark roles.</li>
             </ol>
-          `
-        },
-        {
-          command: "state definition",
-          text: `
+          `,
+    },
+    {
+      command: "state definition",
+      text: `
           <p>State is an object that allows components to keep track of changing data within themselves. It represents the current state of the component and determines how it renders and behaves.</p>
           <ol>
             <li><strong>Declaring State:</strong> You can declare state in a React component by using the useState hook (for functional components) or by extending the React.Component class and defining a state property (for class components).</li>
@@ -77,11 +70,11 @@ const MainPage =() =>{
             <li><strong>Passing State as Props:</strong> You can pass state down to child components as props to share the state between components.</li>
             <li><strong>Local Component State:</strong> State is local and scoped to the component that declares it. It cannot be directly accessed or modified by other components.</li>
           </ol>
-        `
-        },
-        {
-          command: "class and functional difference",
-          text: `
+        `,
+    },
+    {
+      command: "class and functional difference",
+      text: `
           <ol>
             <li><strong>Syntax:</strong> 
               <ul>
@@ -126,12 +119,11 @@ const MainPage =() =>{
               </ul>
             </li>
           </ol>
-        `
-        },
-        {
-          command: "features of react",
-          text: 
-          `
+        `,
+    },
+    {
+      command: "features of react",
+      text: `
           <ol>
             <li><strong>Declarative:</strong> React allows you to describe how your UI should look at any given point in time, and it automatically manages the rendering of components based on changes in state or props.</li>
             <li><strong>Component-Based:</strong> React follows a component-based architecture, where UIs are broken down into small, reusable components.</li>
@@ -144,11 +136,11 @@ const MainPage =() =>{
             <li><strong>Developer Tools:</strong> React comes with a set of developer tools (React DevTools) that provide insights into the component hierarchy, state, and props.</li>
             <li><strong>Ecosystem:</strong> React has a rich ecosystem of libraries and tools.</li>
           </ol>
-        `
-        },
-        {
-            command:"Virtual DOM",
-            text: `
+        `,
+    },
+    {
+      command: "Virtual DOM",
+      text: `
             <p>The Virtual DOM is a lightweight, in-memory representation of the actual DOM. In React, instead of directly manipulating the browser's DOM to update the UI, changes are first made to the Virtual DOM. React then compares the Virtual DOM with the previous version (referred to as reconciliation) and calculates the most efficient way to update the actual DOM.</p>
         
             <h3>How Does the Virtual DOM Work?</h3>
@@ -167,12 +159,11 @@ const MainPage =() =>{
               <li><strong>Abstraction:</strong> The Virtual DOM abstracts away the complexity of directly interacting with the browser's DOM API, making it easier to reason about and manage UI updates in React applications.</li>
               <li><strong>Platform Independence:</strong> Since the Virtual DOM is a JavaScript representation of the DOM, it is platform-independent and can be used in both browser and server environments.</li>
             </ul>
-          `
-        },
-        {
-          command: "ES 6 Features",
-          text:
-          `
+          `,
+    },
+    {
+      command: "ES 6 Features",
+      text: `
           <ol>
             <li><strong>Arrow Functions:</strong> Provides a more concise syntax for writing anonymous functions.</li>
             <li><strong>let and const:</strong> Introduced block-scoped variables (let) and constants (const).</li>
@@ -188,11 +179,11 @@ const MainPage =() =>{
             <li><strong>Iterators and Generators:</strong> Iterators allow defining custom iteration behavior for objects, while generators simplify the creation of iterators.</li>
             <li><strong>Map and Set:</strong> New built-in data structures for storing collections of unique keys or values.</li>
             </ol>
-        `
-        },
-        {
-            command: "Difference between var, let and const",
-            text:`
+        `,
+    },
+    {
+      command: "Difference between var, let and const",
+      text: `
             <p><strong>var:</strong></p>
             <ul>
               <li><code>var</code> was traditionally used to declare variables in JavaScript before the introduction of <code>let</code> and <code>const</code>.</li>
@@ -241,11 +232,11 @@ const MainPage =() =>{
               <li>Use <code>var</code> if you need function-scoped variables (rarely used in modern JavaScript).</li>
               <li>Use <code>let</code> for variables that may be reassigned but are block-scoped.</li>
               <li>Use <code>const</code> for variables that should not be reassigned and are intended to be constant.</li>
-            </ul>`
-        },
-        {
-            command: "IIFE",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "IIFE",
+      text: `
             <p><strong>IIFE (Immediately Invoked Function Expression):</strong></p>
             <ul>
               <li>An IIFE is a JavaScript function that is declared and invoked immediately after its definition.</li>
@@ -266,11 +257,11 @@ const MainPage =() =>{
               <li><strong>Singleton Pattern:</strong> Creating a singleton object using an IIFE to ensure only one instance is created.</li>
               <li><strong>Module Pattern:</strong> Implementing modules in JavaScript by encapsulating related functions and variables within an IIFE.</li>
               <li><strong>Polluting Global Namespace Prevention:</strong> Wrapping third-party library code in an IIFE to prevent conflicts with other scripts.</li>
-            </ul>`
-        },
-        {
-            command:"Props",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Props",
+      text: `
             <p><strong>Props (Properties):</strong></p>
             <ul>
               <li>Props are a way of passing data from parent components to child components in React.</li>
@@ -301,11 +292,11 @@ const MainPage =() =>{
               <li>Passing data from parent components to child components.</li>
               <li>Configuring and customizing child components.</li>
               <li>Providing callback functions to child components for event handling.</li>
-            </ul>`
-        },
-        {
-            command: "State and Props Difference",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "State and Props Difference",
+      text: `
             <p><strong>State vs Props:</strong></p>
             <p>In React, both state and props are used to pass data from one component to another, but they have different purposes and usage:</p>
         
@@ -325,11 +316,11 @@ const MainPage =() =>{
               <li>Props are passed as attributes to components in JSX and are accessed via the <code>props</code> object within the component.</li>
               <li>Props provide a way to customize and configure child components based on the data passed from their parent components.</li>
               <li>Changes to props trigger re-rendering of the component, allowing it to reflect the updated data.</li>
-            </ul>`
-        },
-        {
-            command: "Hoisting",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Hoisting",
+      text: `
             <p><strong>What is Hoisting?</strong></p>
             <p>Hoisting is a JavaScript behavior where variable and function declarations are moved to the top of their containing scope during the compilation phase, regardless of where they are actually declared in the code.</p>
         
@@ -341,11 +332,11 @@ const MainPage =() =>{
             <ul>
               <li><strong>Function Expressions:</strong> Function expressions (e.g., anonymous functions assigned to variables) are not hoisted in the same way as function declarations.</li>
               <li><strong>Block Scope:</strong> let and const declarations are hoisted to the top of their containing block, but are not initialized.</li>
-            </ul>`
-        },
-        {
-            command: "Temporal dead zone",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Temporal dead zone",
+      text: `
             <p>The temporal dead zone is a concept in JavaScript related to the behavior of variables declared with <code>let</code> and <code>const</code> keywords in ES6 (ECMAScript 2015).</p>
             <p>When a variable is declared with <code>let</code> or <code>const</code>, it is hoisted to the top of its scope, similar to variables declared with <code>var</code>. However, unlike <code>var</code> variables, which are initialized with a value of <code>undefined</code> during the hoisting phase, variables declared with <code>let</code> or <code>const</code> remain uninitialized in the temporal dead zone until the point where they are actually declared.</p>
             <p>This means that if you try to access the variable before its declaration point in the code, you'll encounter a <code>ReferenceError</code>. The "dead zone" refers to this period in the code where the variable exists, but is in an inaccessible state due to being uninitialized.</p>
@@ -354,15 +345,15 @@ const MainPage =() =>{
             let x = 10;
             </code></pre>
             <p>In this code snippet, <code>x</code> is in the temporal dead zone until the line where it's declared with <code>let</code>. Trying to access <code>x</code> before that line results in a <code>ReferenceError</code>. This behavior encourages better coding practices by making it clearer where variables are being used before they're initialized.</p>
-          `
-        },
-        {
-            command: "map, filter, find difference",
-            text: `In JavaScript, map, filter, and find are array methods used for different purposes. map transforms each element of an array into a new value based on a callback function and returns a new array with these transformed values. filter creates a new array containing only the elements that pass a certain condition specified by a callback function. find returns the first element in the array that satisfies a given condition specified by a callback function, or undefined if no such element is found. While map and filter always return arrays, find returns a single value (or undefined), making it useful for locating a specific element in an array.`
-        },
-        {
-            command: "Arrow vs Normal function",
-            text: `
+          `,
+    },
+    {
+      command: "map, filter, find difference",
+      text: `In JavaScript, map, filter, and find are array methods used for different purposes. map transforms each element of an array into a new value based on a callback function and returns a new array with these transformed values. filter creates a new array containing only the elements that pass a certain condition specified by a callback function. find returns the first element in the array that satisfies a given condition specified by a callback function, or undefined if no such element is found. While map and filter always return arrays, find returns a single value (or undefined), making it useful for locating a specific element in an array.`,
+    },
+    {
+      command: "Arrow vs Normal function",
+      text: `
             <p><strong>Arrow Functions:</strong></p>
             <ol>
               <li><strong>Syntax:</strong> Arrow functions have a shorter and more concise syntax compared to normal functions.</li>
@@ -380,11 +371,11 @@ const MainPage =() =>{
               <li><strong>Can be Used as Constructors:</strong> Normal functions can be used as constructors with the 'new' keyword to create new objects.</li>
               <li><strong>Can be Used with call(), apply(), or bind():</strong> Normal functions can be explicitly bound to a specific 'this' context using the call(), apply(), or bind() methods.</li>
             </ol>
-          `
-        },
-        {
-            command: "Call, Apply, Bind",
-            text: `
+          `,
+    },
+    {
+      command: "Call, Apply, Bind",
+      text: `
             <p><strong>call()</strong></p>
             <ul>
               <li>The call() method is a function method that allows you to call a function with a specified this value and arguments provided individually.</li>
@@ -405,11 +396,11 @@ const MainPage =() =>{
               <li>Syntax: function.bind(thisArg[, arg1[, arg2[, ...]]])</li>
               <li>bind() returns a new function without executing it immediately.</li>
             </ul>
-          `
-        },
-        {
-            command: "Spread and rest operators",
-            text: `
+          `,
+    },
+    {
+      command: "Spread and rest operators",
+      text: `
             <p><strong>Spread Operator (\`...\`)</strong></p>
             <ul>
               <li>The spread operator (\`...\`) allows an iterable (like an array or string) to be expanded into individual elements.</li>
@@ -434,11 +425,11 @@ const MainPage =() =>{
               <li>It collects all remaining arguments into an array.</li>
               <li>It must be the last parameter in the function's parameter list.</li>
             </ul>
-          `
-        },
-        {
-            command: "redux",
-            text: `
+          `,
+    },
+    {
+      command: "redux",
+      text: `
             <h1>Understanding Redux with React</h1>
             <p>Redux is a predictable state container for JavaScript apps, often used with React to manage the application's state in a single, centralized place. It helps in managing complex state interactions that are hard to express with local state within React components. Redux introduces several key components to achieve this:</p>
             <ul>
@@ -457,11 +448,11 @@ const MainPage =() =>{
               <li>React components that are subscribed to the store (usually via <code>connect</code> function from <code>react-redux</code> or <code>useSelector</code> hook in modern Redux) will re-render with the new state.</li>
             </ol>
             <p>This architecture ensures that state changes are predictable and traceable, making the application easier to understand, debug, and scale.</p>
-          `
-        },
-        {
-            command: "Event Loop",
-            text:`
+          `,
+    },
+    {
+      command: "Event Loop",
+      text: `
             <p><strong>Event Loop:</strong></p>
             <ul>
               <li>The event loop is a key concept in JavaScript's concurrency model, responsible for handling asynchronous operations and managing the execution of code.</li>
@@ -480,11 +471,11 @@ const MainPage =() =>{
             <ul>
               <li>Asynchronous operations: Performing tasks that may take time to complete, such as fetching data from a server, handling user input, or executing timers.</li>
               <li>Event-driven programming: Responding to user interactions, DOM events, or other external events in a non-blocking manner.</li>
-            </ul>`
-        },
-        {
-            command: "Event Bubbling and event capturing",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Event Bubbling and event capturing",
+      text: `
             <p><strong>Event Bubbling:</strong></p>
             <ul>
               <li>Event bubbling is the default behavior in JavaScript where an event triggered on a nested element "bubbles up" through its ancestors in the DOM tree.</li>
@@ -531,11 +522,11 @@ const MainPage =() =>{
                   <li>Implementing advanced event handling logic that requires capturing events before they bubble up.</li>
                 </ul>
               </li>
-            </ul>`
-        },
-        {
-            command: "Undefined and null difference",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Undefined and null difference",
+      text: `
             <p><strong>undefined:</strong></p>
             <ul>
               <li><code>undefined</code> represents a variable that has been declared but has not been assigned a value.</li>
@@ -561,11 +552,11 @@ const MainPage =() =>{
             <ul>
               <li>Use <code>undefined</code> for variables that have not been initialized or when a function does not return a value.</li>
               <li>Use <code>null</code> to explicitly indicate that a variable or object has no value, or as a placeholder for a value that has not been determined yet.</li>
-            </ul>`
-        },
-        {
-            command: "Closure",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Closure",
+      text: `
             <p><strong>Closure:</strong></p>
             <ul>
               <li>A closure is a combination of a function and the lexical environment within which that function was declared.</li>
@@ -609,11 +600,11 @@ const MainPage =() =>{
               <li><strong>Private Variables and Functions:</strong> Creating private members within an object or module to prevent external access.</li>
               <li><strong>Function Factories:</strong> Generating functions with pre-configured behavior based on input parameters.</li>
               <li><strong>Memoization:</strong> Caching the results of expensive function calls to improve performance.</li>
-            </ul>`
-        },
-        {
-            command: "Asynchronous Javascript",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Asynchronous Javascript",
+      text: `
             <p><strong>Asynchronous JavaScript:</strong></p>
             <ul>
               <li>Asynchronous JavaScript refers to code execution that allows other code to run in parallel without blocking the execution of the main program.</li>
@@ -633,11 +624,11 @@ const MainPage =() =>{
               <li>Performing network requests (e.g., fetching data from an API).</li>
               <li>Handling user input and interactions.</li>
               <li>Timers and scheduling tasks (e.g., setTimeout, setInterval).</li>
-            </ul>`
-        },
-        {
-            command: "Display:None and Visibility:Hidden",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Display:None and Visibility:Hidden",
+      text: `
             <p><strong>display: none vs visibility: hidden:</strong></p>
             <p>Both <code>display: none</code> and <code>visibility: hidden</code> are CSS properties used to hide elements from view, but they behave differently:</p>
         
@@ -658,11 +649,11 @@ const MainPage =() =>{
             </ul>
         
             <p>When deciding between <code>display: none</code> and <code>visibility: hidden</code>, consider whether you want the element to be completely removed from the document flow or if you want it to remain in the flow but hidden from view.</p>
-          `
-        },
-        {
-            command: 'Css Box Model',
-            text: `
+          `,
+    },
+    {
+      command: "Css Box Model",
+      text: `
             <p><strong>CSS Box Model:</strong></p>
             <p>The CSS Box Model describes the layout and rendering of elements in a web page. It consists of the following components:</p>
         
@@ -671,11 +662,11 @@ const MainPage =() =>{
               <li><strong>Padding:</strong> The space between the content and the element's border. Padding is transparent by default.</li>
               <li><strong>Border:</strong> The border surrounding the padding and content. It can have a width, style, and color.</li>
               <li><strong>Margin:</strong> The space between the element's border and adjacent elements. Margins do not have a background color and do not display any content.</li>
-            </ul>`
-        },
-        {
-            command:"CSS Selectors",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "CSS Selectors",
+      text: `
             <p><strong>CSS Selectors:</strong></p>
             <p>CSS selectors are patterns used to select and style elements in HTML documents. They specify which elements to target and apply CSS styles to.</p>
         
@@ -735,11 +726,11 @@ const MainPage =() =>{
                   </code>
                 </pre>
               </li>
-            </ul>`
-        },
-        {
-            command: "CSS Positions",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "CSS Positions",
+      text: `
             <p><strong>CSS Positions:</strong></p>
             <p>CSS provides several properties for positioning elements within a document. The most commonly used positions are:</p>
         
@@ -776,22 +767,22 @@ const MainPage =() =>{
               <li>Sticky positioning is a hybrid of relative and fixed positioning.</li>
               <li>It acts like relative positioning until the element reaches a specified scroll position, then it "sticks" in place like fixed positioning.</li>
               <li>Sticky elements are positioned using the <code>top</code>, <code>right</code>, <code>bottom</code>, and <code>left</code> properties.</li>
-            </ul>`
-        },
-        {
-            command: "Z-Index",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Z-Index",
+      text: `
             <p><strong>CSS z-index:</strong></p>
             <p>The <code>z-index</code> property in CSS controls the stacking order of positioned elements.</p>
             <p>Elements with a higher <code>z-index</code> value are stacked above elements with a lower <code>z-index</code> value.</p>
             <p>The <code>z-index</code> property only affects elements that have a <code>position</code> value other than <code>static</code> (the default).</p>
             <p>By default, elements are stacked in the order they appear in the HTML document. However, the <code>z-index</code> property allows you to change the stacking order and control which elements appear on top.</p>
             <p>When two elements overlap, the one with the higher <code>z-index</code> value will appear on top.</p>
-            <p>Elements with a higher <code>z-index</code> value are said to have a higher stacking context, which means they can also affect the stacking order of their descendants.</p>`        
-        },
-        {
-            command: 'CSS Units',
-            text: `
+            <p>Elements with a higher <code>z-index</code> value are said to have a higher stacking context, which means they can also affect the stacking order of their descendants.</p>`,
+    },
+    {
+      command: "CSS Units",
+      text: `
             <p><strong>CSS Units and Differences:</strong></p>
             <p>CSS provides various units for specifying lengths and sizes. Each unit has its own characteristics and use cases:</p>
         
@@ -819,22 +810,22 @@ const MainPage =() =>{
               <li>Absolute units are suitable for defining fixed sizes or dimensions that should remain constant regardless of the context.</li>
               <li>Relative units are more flexible and responsive, adapting to changes in the layout or viewport size.</li>
               <li>Choosing the appropriate unit depends on the specific use case and design requirements.</li>
-            </ul>`
-        },
-        {
-            command: 'doctype',
-            text: `
+            </ul>`,
+    },
+    {
+      command: "doctype",
+      text: `
             <p><strong>HTML5 Doctype:</strong></p>
             <p>The HTML5 doctype declaration is used to specify the document type and version of HTML being used in a web page. It is placed at the beginning of an HTML document and informs the browser that the page is written using HTML5 syntax.</p>
             <pre>&lt;!DOCTYPE html&gt;</pre>
             <p>It is a simple, standardized declaration that tells the browser to interpret the document as HTML5, enabling modern features and ensuring consistent rendering across different browsers.</p>
             <p>Unlike previous versions of HTML, the HTML5 doctype declaration does not require a document type definition (DTD) reference, making it simpler and easier to use.</p>
             <p>By including the HTML5 doctype declaration at the beginning of your HTML documents, you ensure that the browser renders the page in standards mode, providing a more predictable and consistent rendering behavior.</p>
-          `
-        },
-        {
-            command: "Psuedo Classes and Psuedo elements",
-            text: `<p><strong>Pseudo-classes and Pseudo-elements:</strong></p>
+          `,
+    },
+    {
+      command: "Psuedo Classes and Psuedo elements",
+      text: `<p><strong>Pseudo-classes and Pseudo-elements:</strong></p>
             <p>In CSS, pseudo-classes and pseudo-elements are used to style elements based on their state or position in the document:</p>
         
             <p><strong>Pseudo-classes:</strong></p>
@@ -854,11 +845,11 @@ const MainPage =() =>{
             </ul>
         
             <p>Pseudo-classes and pseudo-elements provide powerful tools for styling web documents and creating visually appealing user interfaces. Understanding their usage and applying them appropriately can enhance the design and user experience of web pages.</p>
-          `
-        },
-        {
-            command: 'Context Api vs Redux',
-            text: `
+          `,
+    },
+    {
+      command: "Context Api vs Redux",
+      text: `
             <p><strong>Context API vs Redux:</strong></p>
             <p>Both Context API and Redux are state management solutions for React applications, but they have different use cases and characteristics:</p>
         
@@ -876,11 +867,11 @@ const MainPage =() =>{
               <li>It follows the principles of Flux architecture and provides a centralized store to manage application state, making it easier to maintain and debug large-scale applications.</li>
               <li>Redux uses a unidirectional data flow, where data flows from the store to the components via props, and actions are dispatched to update the state.</li>
               <li>It introduces concepts like actions, reducers, and middleware, which may have a steeper learning curve but offer more control and flexibility over state management.</li>
-            </ul>`
-        },
-        {
-            command:"Pure Component",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Pure Component",
+      text: `
             <p><strong>Pure Component in React:</strong></p>
             <p>A Pure Component in React is similar to a regular component, but it automatically implements <code>shouldComponentUpdate()</code> with a shallow prop and state comparison.</p>
             
@@ -897,11 +888,11 @@ const MainPage =() =>{
             <ul>
               <li>Use Pure Components when the component's render output depends only on its props and state, and it doesn't rely on any other context or external data.</li>
               <li>They are particularly useful in scenarios where a component frequently re-renders with the same props and state, and you want to avoid unnecessary re-renders.</li>
-            </ul>`
-        },
-        {
-            command:"Controlled and UnControlled Components",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Controlled and UnControlled Components",
+      text: `
             <p><strong>Controlled vs Uncontrolled Components in React:</strong></p>
             <p>Controlled and uncontrolled components are two different approaches to handling form elements in React:</p>
         
@@ -969,11 +960,11 @@ const MainPage =() =>{
                   </code>
                 </pre>
               </li>
-            </ul>`        
-        },
-        {
-            command:'Hooks in react',
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Hooks in react",
+      text: `
             <p><strong>React Hooks:</strong></p>
             <p>React Hooks are functions that enable functional components to use state and other React features without writing a class.</p>
         
@@ -1002,11 +993,11 @@ const MainPage =() =>{
             <p>The useImperativeHandle hook customizes the instance value that is exposed to parent components when using the ref attribute with forwardRef.</p>
         
             <p><strong>useLayoutEffect:</strong></p>
-            <p>The useLayoutEffect hook is similar to useEffect but fires synchronously after all DOM mutations. It is useful for performing DOM measurements or animations.</p>`        
-        },
-        {
-            command:"Life Cycle Methods",
-            text: `
+            <p>The useLayoutEffect hook is similar to useEffect but fires synchronously after all DOM mutations. It is useful for performing DOM measurements or animations.</p>`,
+    },
+    {
+      command: "Life Cycle Methods",
+      text: `
             <p><strong>Lifecycle Methods in React:</strong></p>
             <p>React components have lifecycle methods that allow developers to hook into various points in the component's lifecycle. These methods can be used to perform actions such as initializing state, fetching data, and cleaning up resources.</p>
         
@@ -1027,11 +1018,11 @@ const MainPage =() =>{
             <p><strong>Unmounting Phase:</strong></p>
             <ul>
               <li><code>componentWillUnmount()</code>: This method is called immediately before a component is unmounted from the DOM. It is used for cleaning up resources such as event listeners or timers.</li>
-            </ul>`
-        },
-        {
-            command: "UseMemo vs UseEffect",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "UseMemo vs UseEffect",
+      text: `
             <p><strong>useMemo vs useEffect:</strong></p>
             <p>In React, both useMemo and useEffect are hooks used for managing side effects, but they serve different purposes and have different use cases:</p>
         
@@ -1052,11 +1043,11 @@ const MainPage =() =>{
             </ul>
         
             <p>While useMemo is primarily used for optimizing performance by memoizing values, useEffect is used for managing side effects and performing asynchronous operations in functional components.</p>
-          `
-        },
-        {
-            command: "UseMemo vs UseCallback",
-            text: `
+          `,
+    },
+    {
+      command: "UseMemo vs UseCallback",
+      text: `
             <p><strong>useMemo vs useCallback in React:</strong></p>
             <p>In React, both <code>useMemo</code> and <code>useCallback</code> are hooks used to optimize performance by memoizing values or functions, respectively. While they are similar in purpose, they have different use cases:</p>
         
@@ -1077,11 +1068,11 @@ const MainPage =() =>{
             </ul>
         
             <p>While <code>useMemo</code> and <code>useCallback</code> are similar in functionality, they serve different purposes and should be used based on the specific optimization needs of your React components.</p>
-          `
-        },
-        {
-            command: "UseEffect life cycle events",
-            text: `
+          `,
+    },
+    {
+      command: "UseEffect life cycle events",
+      text: `
             <p><strong>useEffect with Lifecycle Events in React:</strong></p>
             <p>The useEffect hook in React is used to perform side effects in functional components. It is similar to lifecycle methods in class components, but it's more flexible and concise.</p>
         
@@ -1118,11 +1109,11 @@ const MainPage =() =>{
             </pre>
         
             <p>With useEffect, you can manage side effects such as data fetching, subscriptions, or manually changing the DOM, making it a powerful tool for working with React components.</p>
-          `
-        },
-        {
-            command: "UseEffect without dependency",
-            text: `
+          `,
+    },
+    {
+      command: "UseEffect without dependency",
+      text: `
             <p><strong>useEffect without Dependency Array:</strong></p>
             <p>In React, the <code>useEffect</code> hook is used to perform side effects in function components. When using <code>useEffect</code> without a dependency array, the effect runs after every render of the component.</p>
         
@@ -1131,11 +1122,11 @@ const MainPage =() =>{
             <p>When <code>useEffect</code> is called without a dependency array, the effect function is executed after every render of the component, including the initial render and subsequent re-renders triggered by state or props changes.</p>
         
             <p>It's important to note that this can lead to performance issues if the effect performs expensive operations or updates the state in a way that causes re-renders. In such cases, it's recommended to specify dependencies to control when the effect should run.</p>
-          `
-        },
-        {
-            command:"Optimization in React",
-            text: `
+          `,
+    },
+    {
+      command: "Optimization in React",
+      text: `
             <p><strong>Optimization Techniques in React:</strong></p>
             <p>React applications can benefit from various optimization techniques to improve performance, reduce rendering time, and enhance the user experience:</p>
         
@@ -1161,11 +1152,11 @@ const MainPage =() =>{
             <ul>
               <li>Code splitting is the process of splitting a JavaScript bundle into smaller chunks that can be loaded on demand.</li>
               <li>React.lazy() and Suspense allow components to be loaded asynchronously, reducing the initial bundle size and improving load times.</li>
-            </ul>`
-        },
-        {
-            command: "UseSelector and UseDispatch",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "UseSelector and UseDispatch",
+      text: `
             <p><strong>useSelector and useDispatch:</strong></p>
             <p>In React Redux, the <code>useSelector</code> and <code>useDispatch</code> hooks are used to interact with the Redux store:</p>
         
@@ -1181,11 +1172,11 @@ const MainPage =() =>{
               <li><code>useDispatch</code> is a hook provided by React Redux that returns a reference to the <code>dispatch</code> function of the Redux store.</li>
               <li>It allows components to dispatch actions to update the Redux store state.</li>
               <li>Components can call the <code>dispatch</code> function with an action object as an argument, which typically includes a type and payload.</li>
-            </ul>`
-        },
-        {
-            command: "Higher Order Components",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Higher Order Components",
+      text: `
             <p><strong>Higher Order Components (HOCs) in React:</strong></p>
             <p>Higher Order Components (HOCs) are a pattern in React used to enhance the functionality of components by wrapping them with other components.</p>
         
@@ -1196,11 +1187,11 @@ const MainPage =() =>{
               <li>HOCs are used for cross-cutting concerns such as authentication, logging, and code splitting.</li>
               <li>HOCs do not modify the original component; instead, they create a new component that wraps the original one.</li>
               <li>HOCs can be composed together to create complex behaviors by chaining multiple HOCs.</li>
-            </ul>`
-        },
-        {
-            command: "Routing V6",
-            text:  `
+            </ul>`,
+    },
+    {
+      command: "Routing V6",
+      text: `
             <p><strong>Routing in React Router v6:</strong></p>
             <p>React Router v6 introduced some changes and improvements over previous versions:</p>
         
@@ -1221,11 +1212,11 @@ const MainPage =() =>{
             <ul>
               <li>Navigation is performed using the <code>useNavigate()</code> hook or the <code>&lt;Link&gt;</code> component.</li>
               <li>Relative navigation is supported, making it easier to navigate within nested routes.</li>
-            </ul>`
-        },
-        {
-            command: "Routing",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Routing",
+      text: `
             <p><strong>Routing in React:</strong></p>
             <p>Routing is the process of navigating between different pages or views in a web application. In React, routing allows us to build single-page applications (SPAs) with multiple views without reloading the page.</p>
         
@@ -1239,11 +1230,11 @@ const MainPage =() =>{
               <li><strong>Navigation:</strong> Use the <code>Link</code> component provided by React Router to navigate between different routes without reloading the page.</li>
               <li><strong>Route Parameters:</strong> Pass parameters in the URL path to create dynamic routes and access them within the component using the <code>useParams</code> hook.</li>
               <li><strong>Programmatic Navigation:</strong> Navigate to different routes programmatically using history manipulation methods provided by React Router.</li>
-            </ul>`
-        },
-        {
-            command: "Synthetic Events",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Synthetic Events",
+      text: `
             <p><strong>Synthetic Events in React:</strong></p>
             <p>In React, synthetic events are a cross-browser wrapper around the browser's native events. They are called "synthetic" because they behave like the native events but are implemented independently to ensure consistent behavior across different browsers.</p>
         
@@ -1253,11 +1244,11 @@ const MainPage =() =>{
               <li>They are designed to closely resemble the native DOM events, making them familiar to developers who are already familiar with JavaScript event handling.</li>
               <li>Synthetic events automatically handle event delegation and event pooling to optimize performance and memory usage.</li>
               <li>They are compatible with React's component-based architecture and integrate seamlessly with JSX syntax.</li>
-            </ul>`
-        },
-        {
-            command: "Key Prop in react",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Key Prop in react",
+      text: `
             <p><strong>Key Prop in React:</strong></p>
             <p>The <code>key</code> prop is a special attribute that is used to uniquely identify elements in a React component's list.</p>
         
@@ -1271,11 +1262,11 @@ const MainPage =() =>{
             <ul>
               <li>The <code>key</code> prop should be assigned a value that uniquely identifies each element in the list, such as an ID or a unique attribute.</li>
               <li>Keys should be stable, predictable, and consistent across renders. Avoid using indexes as keys if the order of items may change.</li>
-            </ul>`
-        },
-        {
-            command: "React routing different from conventional routing",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "React routing different from conventional routing",
+      text: `
             <p><strong>React Routing vs Conventional Routing:</strong></p>
             <p>In React, routing refers to the navigation between different components or pages within a single-page application (SPA). While React does not have built-in routing functionality, it provides libraries like React Router for handling routing.</p>
         
@@ -1293,11 +1284,11 @@ const MainPage =() =>{
               <li>Each URL typically corresponds to a separate HTML page or endpoint on the server, and navigation between pages involves full-page reloads.</li>
               <li>Conventional routing requires server-side logic to handle routing and serve the appropriate content based on the requested URL.</li>
               <li>It is less common in modern web development, especially for SPAs, where React routing or similar client-side routing libraries are preferred for their improved performance and user experience.</li>
-            </ul>`
-        },
-        {
-            command: "Typescript with React",
-            text: `<p><strong>TypeScript:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Typescript with React",
+      text: `<p><strong>TypeScript:</strong></p>
             <p>TypeScript is a superset of JavaScript that adds static type-checking and other features to the language.</p>
             
             <p><strong>Features of TypeScript:</strong></p>
@@ -1317,11 +1308,11 @@ const MainPage =() =>{
               <li><strong>Managing State:</strong> TypeScript allows developers to define types for state variables, ensuring consistency and catching potential errors.</li>
               <li><strong>Working with APIs:</strong> TypeScript provides type definitions for many popular libraries and APIs, making it easier to work with external data sources.</li>
               <li><strong>Enforcing Contracts:</strong> TypeScript's static type-checking helps enforce contracts between components, improving code reliability and maintainability.</li>
-            </ul>`
-        },
-        {
-            command: "Axios vs Fetch",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Axios vs Fetch",
+      text: `
             <p><strong>Axios vs Fetch:</strong></p>
             <p>Axios and Fetch are both JavaScript libraries used for making HTTP requests in web applications, but they have some differences:</p>
         
@@ -1341,11 +1332,11 @@ const MainPage =() =>{
               <li>Fetch uses Promises for handling asynchronous operations, but it lacks some features compared to Axios, such as built-in support for request cancellation, timeout handling, and progress events.</li>
               <li>Fetch has native support for streaming and working with different types of data, including FormData, Blobs, and ArrayBuffers.</li>
               <li>It is recommended for use in modern web applications where browser compatibility is not a concern and when a lightweight solution for making HTTP requests is sufficient.</li>
-            </ul>`
-        },
-        {
-            command: "Axios Interceptors",
-            text: `
+            </ul>`,
+    },
+    {
+      command: "Axios Interceptors",
+      text: `
             <p><strong>Axios Interceptors:</strong></p>
             <p>Axios interceptors allow you to intercept requests or responses before they are handled by the 'axios' instance.</p>
         
@@ -1371,11 +1362,11 @@ const MainPage =() =>{
             </ul>
         
             <p>Axios interceptors provide a powerful mechanism for intercepting and modifying HTTP requests and responses in your application.</p>
-          `
-        },
-        {
-            command: "Redux Toolkit",
-            text: ` <p><strong>Redux Toolkit:</strong></p>
+          `,
+    },
+    {
+      command: "Redux Toolkit",
+      text: ` <p><strong>Redux Toolkit:</strong></p>
             <p>Redux Toolkit is the official, recommended way to write Redux logic. It is designed to simplify the process of writing Redux code, making it more efficient and less error-prone.</p>
         
             <p><strong>Features of Redux Toolkit:</strong></p>
@@ -1386,11 +1377,11 @@ const MainPage =() =>{
               <li><strong>Immutable Updates:</strong> Redux Toolkit uses the Immer library internally to enable immutable updates to the Redux store state. This allows developers to write simpler, more readable code when updating the state, without having to worry about mutating the original state.</li>
               <li><strong>Thunks:</strong> Redux Toolkit includes built-in support for thunks, which are asynchronous action creators. Thunks provide a convenient way to handle asynchronous logic, such as making API requests, and dispatching multiple actions in response to asynchronous events.</li>
             </ul>
-        `
-        },
-        {
-            command: "Promise",
-            text: ` <p><strong>Promises in JavaScript:</strong></p>
+        `,
+    },
+    {
+      command: "Promise",
+      text: ` <p><strong>Promises in JavaScript:</strong></p>
             <p>A promise is an object representing the eventual completion or failure of an asynchronous operation. It allows you to handle asynchronous code more easily and avoid callback hell.</p>
         
             <p><strong>Promise States:</strong></p>
@@ -1409,11 +1400,11 @@ const MainPage =() =>{
               <li><strong>then(onFulfilled, onRejected):</strong> Adds fulfillment and rejection handlers to the promise.</li>
               <li><strong>catch(onRejected):</strong> Adds a rejection handler to the promise.</li>
               <li><strong>finally(onFinally):</strong> Adds a handler to be called when the promise is settled (fulfilled or rejected).</li>
-            </ul>`
-        },
-        {
-            command: "Async/Await",
-            text: ` <p><strong>Async/Await in JavaScript:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Async/Await",
+      text: ` <p><strong>Async/Await in JavaScript:</strong></p>
             <p>Async/await is a modern JavaScript feature that makes asynchronous code easier to read, write, and maintain.</p>
         
             <p><strong>Async Functions:</strong></p>
@@ -1435,11 +1426,11 @@ const MainPage =() =>{
               <li><strong>Readability:</strong> Async/await code is more readable and easier to understand compared to nested callbacks or Promise chains.</li>
               <li><strong>Simplicity:</strong> Async/await simplifies error handling and control flow in asynchronous code.</li>
               <li><strong>Debugging:</strong> Debugging async/await code is easier because it looks and behaves like synchronous code.</li>
-            </ul>`
-        },
-        {
-            command: "Promises vs Async/Await",
-            text: `<p><strong>Async/Await vs Promises:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Promises vs Async/Await",
+      text: `<p><strong>Async/Await vs Promises:</strong></p>
             <p>Async/Await and Promises are both used in JavaScript to handle asynchronous code execution, but they have different syntax and usage:</p>
         
             <p><strong>Promises:</strong></p>
@@ -1483,32 +1474,32 @@ const MainPage =() =>{
                   </code>
                 </pre>
               </li>
-            </ul>`
-        },
-        {
-            command: 'Index.js in react',
-            text: `<p><strong>index.js in React Root File:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Index.js in react",
+      text: `<p><strong>index.js in React Root File:</strong></p>
             <p><code>index.js</code> is the entry point for a React application, located in the root directory of the project.</p>
             <p>It is responsible for rendering the root component of the application into the DOM.</p>
             <p>The <code>ReactDOM.render()</code> function is called to render the root component (typically the <code>&lt;App /&gt;</code> component) into a specified HTML element in the DOM.</p>
             <p>Any changes to the root component or its child components will trigger React's virtual DOM reconciliation process, updating the UI as necessary.</p>
             <p><strong>Use Case:</strong></p>
             <p><code>index.js</code> is typically not modified frequently and serves as the entry point for the React application. It sets up the initial rendering of the application and establishes the relationship between React components and the DOM.</p>
-          `
-        },
-        {
-            command: "Authentication using JWT",
-            text: ` <p><strong>Implementing Authentication Using JWT Tokens in React:</strong></p>
+          `,
+    },
+    {
+      command: "Authentication using JWT",
+      text: ` <p><strong>Implementing Authentication Using JWT Tokens in React:</strong></p>
             <ol>
               <li><strong>User Authentication:</strong> When a user logs in with valid credentials, the server generates a JWT token and sends it back to the client. The client stores the JWT token, usually in local storage or a cookie.</li>
               <li><strong>Sending JWT with Requests:</strong> For subsequent requests to protected routes, the client includes the JWT token in the request headers (commonly in the <code>Authorization</code> header).</li>
               <li><strong>Server-Side Validation:</strong> The server receives the JWT token with each request and verifies its authenticity and validity. If the token is valid, the server responds with the requested data.</li>
               <li><strong>Handling Expired Tokens:</strong> If a JWT token expires, the client needs to handle it by either refreshing the token (if supported by the server) or redirecting the user to the login page to reauthenticate.</li>
-            </ol>`
-        },
-        {
-            command: 'Handling sessions in react',
-            text: `<p><strong>Handling Sessions in React:</strong></p>
+            </ol>`,
+    },
+    {
+      command: "Handling sessions in react",
+      text: `<p><strong>Handling Sessions in React:</strong></p>
             <ul>
               <li>React is a client-side JavaScript library and does not have built-in support for server-side sessions like traditional server-side frameworks.</li>
               <li>Sessions can still be managed in React applications by leveraging browser features such as localStorage, sessionStorage, or cookies.</li>
@@ -1535,11 +1526,11 @@ const MainPage =() =>{
               <li>Always use HTTPS to encrypt data transmitted between the client and server.</li>
               <li>Avoid storing sensitive information in localStorage as it is accessible to JavaScript code running on the same domain.</li>
               <li>Consider using HTTP-only cookies for storing authentication tokens to prevent them from being accessed by client-side JavaScript.</li>
-            </ul>`
-        },
-        {
-            command: "React Portals",
-            text: `<p><strong>React Portals:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "React Portals",
+      text: `<p><strong>React Portals:</strong></p>
             <ul>
               <li>React Portals provide a way to render children components into a different part of the DOM hierarchy that is outside of the parent component's DOM hierarchy.</li>
               <li>This allows you to render components into a different DOM element, such as one that is a sibling or ancestor of the parent component.</li>
@@ -1551,11 +1542,11 @@ const MainPage =() =>{
               <li>Import the <code>ReactDOM</code> package.</li>
               <li>Create a portal using the <code>ReactDOM.createPortal()</code> method.</li>
               <li>Specify the content to render and the target DOM element to render into.</li>
-            </ol>`
-        },
-        {
-            command: "Fragment vs Div",
-            text: `<p><strong>React Fragments vs. <code>&lt;div&gt;</code>:</strong></p>
+            </ol>`,
+    },
+    {
+      command: "Fragment vs Div",
+      text: `<p><strong>React Fragments vs. <code>&lt;div&gt;</code>:</strong></p>
             <p>React Fragments provide a way to group multiple React elements without introducing an extra DOM element.</p>
             <ul>
               <li><strong>React Fragments:</strong>
@@ -1572,11 +1563,11 @@ const MainPage =() =>{
                   <li>It's a valid choice when you need a container element with additional styling or functionality.</li>
                 </ul>
               </li>
-            </ul>`
-        },
-        {
-            command:"React.memo",
-            text: ` <p><strong>React.memo:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "React.memo",
+      text: ` <p><strong>React.memo:</strong></p>
             <ul>
               <li><code>React.memo</code> is a higher-order component in React that memoizes the rendered output of a component.</li>
               <li>It improves the performance of functional components by preventing unnecessary re-renders when the component's props remain the same.</li>
@@ -1587,22 +1578,22 @@ const MainPage =() =>{
               <li>Use <code>React.memo</code> for functional components that render the same output given the same input props.</li>
               <li>It is especially useful for optimizing performance in components that receive frequent updates with the same props.</li>
             </ul>
-            `
-        },
-        {
-            command: "Optimization of heavy data in react",
-            text: `<p><strong>Optimization of Rendering Large Amounts of Data in React:</strong></p>
+            `,
+    },
+    {
+      command: "Optimization of heavy data in react",
+      text: `<p><strong>Optimization of Rendering Large Amounts of Data in React:</strong></p>
             <ul>
               <li><strong>Virtualization:</strong> Use techniques like virtualization to render only the visible portion of the data. Libraries like React Virtualized or react-window can efficiently handle large lists by rendering only the items that are currently in view.</li>
               <li><strong>Pagination:</strong> Implement pagination to fetch and display data in smaller chunks, reducing the initial load time and memory consumption.</li>
               <li><strong>Memoization:</strong> Memoize expensive calculations or data transformations using libraries like React.memo or useMemo to prevent unnecessary re-renders.</li>
               <li><strong>Server-side Rendering (SSR):</strong> Utilize server-side rendering to pre-render the initial page content on the server and send it to the client, reducing the time-to-interactive and improving SEO.</li>
               <li><strong>Optimized Component Lifecycle:</strong> Optimize component lifecycle methods such as shouldComponentUpdate or PureComponent to prevent unnecessary re-renders of components.</li>
-            </ul>`
-        },
-        {
-            command: "SSR VS CSR server side vs client side rendering",
-            text: ` <p><strong>SSR (Server-Side Rendering) vs CSR (Client-Side Rendering) in React:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "SSR VS CSR server side vs client side rendering",
+      text: ` <p><strong>SSR (Server-Side Rendering) vs CSR (Client-Side Rendering) in React:</strong></p>
             <p>SSR (Server-Side Rendering) and CSR (Client-Side Rendering) are two different approaches to rendering web pages in React.</p>
         
             <p><strong>SSR (Server-Side Rendering):</strong></p>
@@ -1620,22 +1611,22 @@ const MainPage =() =>{
               <li>The React components are rendered on the client-side, and the page content is updated dynamically.</li>
               <li>CSR provides a better user experience for interactive web applications, as it allows for faster navigation and dynamic content updates without full page reloads.</li>
               <li>However, CSR can lead to slower initial load times and issues with SEO, as search engines may have difficulty crawling dynamically generated content.</li>
-            </ul>`
-        },
-        {
-            command: "Lazy Loading and code Splitting",
-            text: `<p><strong>Lazy Loading and Code Splitting in React:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Lazy Loading and code Splitting",
+      text: `<p><strong>Lazy Loading and Code Splitting in React:</strong></p>
             <ul>
               <li>Lazy loading and code splitting are techniques used in React to improve performance by reducing the initial bundle size of an application.</li>
               <li><strong>Lazy Loading:</strong> Lazy loading involves delaying the loading of certain parts of the application until they are needed. This can help reduce the initial load time of the application by only loading the necessary code when it is required.</li>
               <li><strong>Code Splitting:</strong> Code splitting involves breaking the application's bundle into smaller chunks, or "chunks," and only loading the required chunks when they are needed. This can help reduce the initial bundle size and improve loading times, especially for larger applications.</li>
               <li>React provides built-in support for lazy loading and code splitting through the <code>React.lazy</code> function and the <code>import()</code> syntax.</li>
               <li>The <code>React.lazy</code> function allows you to dynamically import a component only when it is needed, while the <code>import()</code> syntax allows you to dynamically import other modules and assets.</li>
-            </ul>`
-        },
-        {
-            command: "Primitive vs Referential",
-            text: ` <p><strong>Primitive Data Types:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Primitive vs Referential",
+      text: ` <p><strong>Primitive Data Types:</strong></p>
             <ul>
               <li>Primitive data types are immutable and stored directly in memory.</li>
               <li>JavaScript has six primitive data types: <code>string</code>, <code>number</code>, <code>boolean</code>, <code>null</code>, <code>undefined</code>, and <code>symbol</code>.</li>
@@ -1647,11 +1638,11 @@ const MainPage =() =>{
               <li>Referential data types are mutable and stored by reference in memory.</li>
               <li>JavaScript has one referential data type: <code>object</code>. and Array is also considered as an object only</code></li>
               <li>Operations on referential data types affect the reference to the value, not the value itself.</li>
-            </ul>`
-        },
-        {
-            command: "scss",
-            text: ` <p><strong>SCSS (Sassy CSS):</strong></p>
+            </ul>`,
+    },
+    {
+      command: "scss",
+      text: ` <p><strong>SCSS (Sassy CSS):</strong></p>
             <p>SCSS is a superset of CSS that adds powerful features like variables, nesting, mixins, and inheritance. It provides a more structured and efficient way to write CSS code, making stylesheets easier to maintain and manage.</p>
         
             <p><strong>Features of SCSS:</strong></p>
@@ -1661,21 +1652,21 @@ const MainPage =() =>{
               <li><strong>Mixins:</strong> Mixins are reusable blocks of CSS that can be included in other selectors. They allow you to define styles once and apply them to multiple elements, reducing code duplication.</li>
               <li><strong>Inheritance:</strong> SCSS supports inheritance, allowing you to extend styles from one selector to another. This promotes code reuse and makes it easier to create variations of existing styles.</li>
             </ol>
-        `
-        },
-        {
-            command: "Ways to add styling in react",
-            text: ` <p><strong>All Possible Ways to Apply Styling in React:</strong></p>
+        `,
+    },
+    {
+      command: "Ways to add styling in react",
+      text: ` <p><strong>All Possible Ways to Apply Styling in React:</strong></p>
             <ol>
               <li><strong>Inline Styles:</strong> Inline styles allow you to apply CSS directly to individual React elements using the <code>style</code> attribute.</li>
               <li><strong>CSS Modules:</strong> CSS Modules allow you to write CSS styles in separate files and import them into your React components. Styles are scoped locally to each component.</li>
               <li><strong>Styled Components:</strong> Styled Components is a library that allows you to write CSS directly within your JavaScript files using tagged template literals.</li>
               <li><strong>CSS-in-JS Libraries:</strong> There are several CSS-in-JS libraries (besides Styled Components) that allow you to write CSS styles directly in JavaScript files.</li>
-            </ol>`
-        },
-        {
-            command: "Web Storages",
-            text: `
+            </ol>`,
+    },
+    {
+      command: "Web Storages",
+      text: `
             <p><strong>Web Storage in HTML:</strong></p>
             <p>Web storage in HTML provides two mechanisms for storing data locally within the user's browser:</p>
             <ul>
@@ -1709,11 +1700,11 @@ const MainPage =() =>{
                 const data = sessionStorage.getItem('key');
                 console.log(data); // Output: 'value'
               </code>
-            </pre>`
-        },
-        {
-            command: "Accessability in HTML5",
-            text: `<p><strong>Accessibility in HTML5:</strong></p>
+            </pre>`,
+    },
+    {
+      command: "Accessability in HTML5",
+      text: `<p><strong>Accessibility in HTML5:</strong></p>
             <p>Accessibility refers to the design of products, devices, services, or environments for people with disabilities. In the context of web development, accessibility aims to ensure that websites and web applications are usable by all people, including those with disabilities.</p>
             <p>HTML5 introduced several features to improve accessibility and make the web more inclusive:</p>
             <ul>
@@ -1723,11 +1714,11 @@ const MainPage =() =>{
               <li><strong>Media Elements:</strong> HTML5 media elements like &lt;audio&gt; and &lt;video&gt; support built-in accessibility features such as captions, subtitles, audio descriptions, and transcript support, making multimedia content more accessible.</li>
               <li><strong>Canvas Accessibility:</strong> HTML5 introduced accessibility features for &lt;canvas&gt; elements, allowing developers to provide alternative text descriptions and keyboard navigation for canvas-based content.</li>
               <li><strong>SVG Accessibility:</strong> HTML5 improved accessibility support for Scalable Vector Graphics (SVG), enabling developers to create accessible charts, diagrams, and graphics using SVG.</li>
-            </ul>`
-        },
-        {
-            command: "Webpack",
-            text: ` <p><strong>Webpack in React:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Webpack",
+      text: ` <p><strong>Webpack in React:</strong></p>
             <p>Webpack is a popular module bundler for JavaScript applications. It is commonly used in React projects to bundle and optimize the application's assets, such as JavaScript files, CSS files, and images.</p>
             <p>Webpack allows developers to organize their code into modules and then bundles these modules into a single or multiple output files, known as bundles. This helps improve performance by reducing the number of HTTP requests and optimizing the size of assets.</p>
             <p>Key features of webpack in React include:</p>
@@ -1737,11 +1728,11 @@ const MainPage =() =>{
               <li><strong>Code Splitting:</strong> Webpack allows splitting the code into multiple bundles, which can be loaded asynchronously, improving the initial loading time of the application.</li>
               <li><strong>Hot Module Replacement (HMR):</strong> Webpack's HMR feature enables developers to see changes in the code reflected immediately in the browser without a full page reload, speeding up the development process.</li>
               <li><strong>Production Optimization:</strong> Webpack offers various optimization techniques, such as minification, tree shaking, and code splitting, to optimize the production build of the application for performance.</li>
-            </ul>`
-        },
-        {
-            command: "configure webpack",
-            text: `<p><strong>Configuring Webpack in a React Application:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "configure webpack",
+      text: `<p><strong>Configuring Webpack in a React Application:</strong></p>
             <ol>
               <li><strong>Install webpack and webpack-cli:</strong> Use npm or yarn to install webpack and webpack-cli as devDependencies.</li>
               <li><strong>Create a webpack Configuration File:</strong> Create a webpack.config.js file in the root directory of your project and define the webpack configuration.</li>
@@ -1750,11 +1741,11 @@ const MainPage =() =>{
               <li><strong>Configure Resolve Extensions:</strong> Ensure webpack can resolve import statements without file extensions.</li>
               <li><strong>Create Scripts in package.json:</strong> Define scripts for building and running the application using webpack.</li>
               <li><strong>Run webpack:</strong> Use npm or yarn scripts to run webpack for development or production builds.</li>
-            </ol>`
-        },
-        {
-            command: "JSX in react",
-            text: ` <p><strong>JSX in React:</strong></p>
+            </ol>`,
+    },
+    {
+      command: "JSX in react",
+      text: ` <p><strong>JSX in React:</strong></p>
             <ul>
               <li><strong>Syntax Extension:</strong> JSX allows developers to write XML-like syntax within JavaScript code.</li>
               <li><strong>Familiarity:</strong> JSX resembles HTML, making it easier for developers to create and visualize the structure of their React components.</li>
@@ -1774,11 +1765,11 @@ const MainPage =() =>{
               <li><strong>Component Rendering:</strong> JSX is used to define the structure and content of React components.</li>
               <li><strong>Event Handling:</strong> JSX enables the definition of event handlers for user interactions, such as onClick or onChange events.</li>
               <li><strong>Conditional Rendering:</strong> JSX supports conditional rendering using JavaScript expressions, allowing components to render different content based on certain conditions.</li>
-            </ul>`
-        },
-        {
-            command: "Angular vs React",
-            text: `<p><strong>Angular vs. React:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Angular vs React",
+      text: `<p><strong>Angular vs. React:</strong></p>
             <p>Both Angular and React are popular JavaScript frameworks/libraries for building web applications, but they have different philosophies, architectures, and ecosystems.</p>
         
             <p><strong>Angular:</strong></p>
@@ -1806,11 +1797,11 @@ const MainPage =() =>{
               <li>Angular applications are typically written in TypeScript, while React applications can be written in plain JavaScript or JSX.</li>
               <li>Angular provides more built-in features and tools out of the box, while React relies on a rich ecosystem of third-party libraries and tools.</li>
               <li>Angular has a more opinionated architecture and convention, while React gives developers more flexibility and freedom to choose their preferred tools and patterns.</li>
-            </ul>`
-        },
-        {
-            command: "Block and Inline",
-            text:`<p><strong>Block vs Inline Elements:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Block and Inline",
+      text: `<p><strong>Block vs Inline Elements:</strong></p>
             <p>HTML elements are categorized into two main types: block-level elements and inline elements.</p>
         
             <p><strong>Block-level Elements:</strong></p>
@@ -1833,11 +1824,11 @@ const MainPage =() =>{
               <li>Block-level elements stack vertically, creating "blocks" of content, whereas inline elements are placed within the flow of text.</li>
               <li>Block-level elements can contain other block-level and inline elements, while inline elements cannot contain block-level elements.</li>
             </ul>
-        `
-        },
-        {
-            command: "Callback hell",
-            text: `<p><strong>Callback Hell:</strong></p>
+        `,
+    },
+    {
+      command: "Callback hell",
+      text: `<p><strong>Callback Hell:</strong></p>
             <ul>
               <li>Callback hell, also known as "pyramid of doom," refers to the situation in JavaScript where multiple nested callback functions create unreadable and difficult-to-maintain code.</li>
               <li>It typically occurs when dealing with asynchronous operations that depend on each other or have complex dependencies.</li>
@@ -1857,19 +1848,19 @@ const MainPage =() =>{
               <li><strong>Async/Await:</strong> Async functions and the <code>await</code> keyword provide a more readable and synchronous-like syntax for writing asynchronous code, reducing the nesting of callbacks.</li>
               <li><strong>Modularization:</strong> Break down complex operations into smaller, more manageable functions to reduce nesting and improve readability.</li>
             </ol>
-        `
-        },
-        {
-            command: "Currying",
-            text: `<p><strong>Currying in JavaScript:</strong></p>
+        `,
+    },
+    {
+      command: "Currying",
+      text: `<p><strong>Currying in JavaScript:</strong></p>
             <p>Currying is a technique in functional programming where a function with multiple arguments is transformed into a sequence of nested functions, each taking a single argument.</p>
             <p>Curried functions allow for partial application, meaning you can create specialized versions of the original function with some of its arguments pre-filled.</p>
             <p>Currying can be implemented manually or using built-in methods like <code>bind()</code> or libraries like lodash.</p>
-            `
-        },
-        {
-            command: "Errors in Javascript",
-            text: ` <p><strong>Errors in JavaScript:</strong></p>
+            `,
+    },
+    {
+      command: "Errors in Javascript",
+      text: ` <p><strong>Errors in JavaScript:</strong></p>
             <p>In JavaScript, errors occur when something unexpected happens during the execution of code. Errors can occur due to various reasons, including syntax errors, runtime errors, and logical errors.</p>
             
             <p><strong>Types of Errors:</strong></p>
@@ -1878,10 +1869,10 @@ const MainPage =() =>{
               <li><strong>Runtime Errors:</strong> Runtime errors occur during the execution of the code when an operation cannot be performed as expected. This can happen due to various reasons, such as division by zero, accessing undefined variables, or calling a method on an undefined object.</li>
               <li><strong>Logical Errors:</strong> Logical errors occur when the code does not produce the expected result due to incorrect logic or algorithmic mistakes. These errors are often challenging to detect and debug because the code runs without throwing any errors.</li>
             </ol>`,
-        },
-        {
-            command: "Implicit type conversion",
-            text: `<p><strong>Implicit Type Conversion in JavaScript:</strong></p>
+    },
+    {
+      command: "Implicit type conversion",
+      text: `<p><strong>Implicit Type Conversion in JavaScript:</strong></p>
             <ul>
               <li>Implicit type conversion, also known as type coercion, is the automatic conversion of values from one data type to another by the JavaScript engine.</li>
               <li>It occurs when an operator or function expects one data type but receives another, causing JavaScript to convert the values to the expected type.</li>
@@ -1896,11 +1887,11 @@ const MainPage =() =>{
             </ul>
         
             <p>Understanding implicit type conversion is crucial for writing JavaScript code that behaves predictably and avoids common pitfalls.</p>
-          `
-        },
-        {
-            command: "Empty elements in HTML",
-            text: ` <p><strong>Empty Elements in HTML5:</strong></p>
+          `,
+    },
+    {
+      command: "Empty elements in HTML",
+      text: ` <p><strong>Empty Elements in HTML5:</strong></p>
             <p>In HTML5, some elements do not require closing tags and are called empty elements or self-closing tags.</p>
             <p>These elements are used to insert content or provide functionality without any inner content.</p>
             <p>Empty elements are written with a single tag, followed by a slash before the closing angle bracket.</p>
@@ -1912,31 +1903,31 @@ const MainPage =() =>{
               <li><code>&lt;meta charset="utf-8"&gt;</code>: Metadata</li>
             </ul>
             <p>These elements are used when there is no need for inner content, and they provide specific functionality or display.</p>
-        `
-        },
-        {
-            command: "Lists in HTML5",
-            text: `<p><strong>Lists in HTML5:</strong></p>
+        `,
+    },
+    {
+      command: "Lists in HTML5",
+      text: `<p><strong>Lists in HTML5:</strong></p>
             <p>HTML5 provides three types of lists:</p>
             <ol>
               <li><strong>Ordered Lists (<code>&lt;ol&gt;</code>):</strong> Ordered lists are lists where each list item is numbered.</li>
               <li><strong>Unordered Lists (<code>&lt;ul&gt;</code>):</strong> Unordered lists are lists where each list item is marked with a bullet point (disc, circle, or square).</li>
               <li><strong>Description Lists (<code>&lt;dl&gt;</code>):</strong> Description lists are lists of term-description pairs, with each term followed by its description.</li>
-            </ol>`
-        },
-        {
-            command: "white space",
-            text: `<p><strong>Whitespace in JSX:</strong></p>
+            </ol>`,
+    },
+    {
+      command: "white space",
+      text: `<p><strong>Whitespace in JSX:</strong></p>
             <ul>
               <li>Whitespace in JSX is treated differently from regular HTML.</li>
               <li>In JSX, whitespace between elements and within elements is preserved.</li>
               <li>However, leading and trailing whitespace in multiline JSX expressions is typically ignored.</li>
               <li>Whitespace within HTML tags, such as spaces or line breaks, is also preserved.</li>
-            </ul>`
-        },
-        {
-            command: "Responsive Web Design",
-            text: `<p><strong>Responsive Web Design:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Responsive Web Design",
+      text: `<p><strong>Responsive Web Design:</strong></p>
             <p>Responsive web design (RWD) is an approach to designing and coding websites to provide an optimal viewing and interaction experience across a wide range of devices, from desktop computers to mobile phones.</p>
             
             <p><strong>Key Principles of Responsive Web Design:</strong></p>
@@ -1955,11 +1946,11 @@ const MainPage =() =>{
         
             <p><strong>Conclusion:</strong></p>
             <p>Responsive web design is essential for creating modern websites that provide a seamless and user-friendly experience across various devices. By implementing responsive design principles, developers can ensure that their websites are accessible, visually appealing, and performant on any screen size or device.</p>
-        `
-        },
-        {
-            command: "Specificity",
-            text: ` <p><strong>Specificity:</strong></p>
+        `,
+    },
+    {
+      command: "Specificity",
+      text: ` <p><strong>Specificity:</strong></p>
             <p>In CSS, specificity determines which styles are applied to an element when multiple conflicting CSS rules target the same element.</p>
             <p>Specificity is calculated based on the combination of selectors used in a CSS rule.</p>
             <p>The following factors contribute to specificity:</p>
@@ -1971,11 +1962,11 @@ const MainPage =() =>{
             </ul>
             <p>When multiple CSS rules apply to the same element, the rule with the highest specificity takes precedence.</p>
             <p>If two rules have the same specificity, the one that appears last in the CSS file is applied.</p>
-        `
-        },
-        {
-            command: "Clearfix",
-            text: `<p><strong>Clearfix:</strong></p>
+        `,
+    },
+    {
+      command: "Clearfix",
+      text: `<p><strong>Clearfix:</strong></p>
             <ul>
               <li>Clearfix is a CSS technique used to fix issues related to floated elements within a container.</li>
               <li>When elements are floated within a container, the container may collapse and not expand to contain the floated elements.</li>
@@ -1997,11 +1988,11 @@ const MainPage =() =>{
                   &lt;div class="floated-element" style="float: right;"&gt;Floated Element 2&lt;/div&gt;
                 &lt;/div&gt;
               </code>
-            </pre>`
-        },
-        {
-            command: "Floats",
-            text: `<p><strong>Floats in CSS:</strong></p>
+            </pre>`,
+    },
+    {
+      command: "Floats",
+      text: `<p><strong>Floats in CSS:</strong></p>
             <ul>
               <li>Floats in CSS are used to position elements horizontally within their containing element.</li>
               <li>When an element is floated, it is taken out of the normal flow of the document and shifted to the left or right until it reaches the edge of its containing element or another floated element.</li>
@@ -2020,11 +2011,11 @@ const MainPage =() =>{
               <li>Creating multi-column layouts.</li>
               <li>Positioning elements beside each other.</li>
               <li>Creating complex page layouts.</li>
-            </ul>`
-        },
-        {
-            command: "How to improve performance of page in CSS",
-            text: ` <p><strong>How to Improve Performance Using CSS:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "How to improve performance of page in CSS",
+      text: ` <p><strong>How to Improve Performance Using CSS:</strong></p>
             <p>Improving the performance of a web page using CSS involves several techniques:</p>
             <ol>
               <li><strong>Minification:</strong> Minify CSS files to reduce their size by removing unnecessary whitespace, comments, and redundant code.</li>
@@ -2035,11 +2026,11 @@ const MainPage =() =>{
               <li><strong>Media Queries:</strong> Use media queries to apply different styles based on the screen size, device orientation, or other device characteristics to optimize layout and performance for different devices.</li>
               <li><strong>CSS Frameworks:</strong> Consider using lightweight CSS frameworks or customizing larger frameworks to include only the necessary styles to reduce CSS file size.</li>
               <li><strong>Inlining Critical CSS:</strong> Inline critical CSS directly into the HTML document to reduce render-blocking CSS and improve initial rendering performance.</li>
-            </ol>`
-        },
-        {
-            command: "How many ways we can achieve responsive",
-            text: `<p><strong>Responsive Web Design Techniques:</strong></p>
+            </ol>`,
+    },
+    {
+      command: "How many ways we can achieve responsive",
+      text: `<p><strong>Responsive Web Design Techniques:</strong></p>
             <ol>
               <li><strong>CSS Media Queries:</strong> Adjust CSS styles based on the width of the viewport or device.</li>
               <li><strong>Viewport Units (vw, vh):</strong> Specify dimensions relative to the viewport size.</li>
@@ -2050,11 +2041,11 @@ const MainPage =() =>{
               <li><strong>CSS Frameworks:</strong> Use CSS frameworks like Bootstrap, Foundation, or Bulma, which provide pre-built responsive components and grid systems.</li>
             </ol>
             <p>Implementing responsive design techniques is essential for ensuring your website looks and performs well across various devices and screen sizes.</p>
-        `
-        },
-        {
-            command: "Higher Order Functions",
-            text: `<p><strong>Higher-Order Functions in JavaScript:</strong></p>
+        `,
+    },
+    {
+      command: "Higher Order Functions",
+      text: `<p><strong>Higher-Order Functions in JavaScript:</strong></p>
             <ul>
               <li>A higher-order function is a function that takes one or more functions as arguments or returns a function as its result.</li>
               <li>Higher-order functions enable more concise and expressive code by promoting code reusability and composability.</li>
@@ -2073,33 +2064,33 @@ const MainPage =() =>{
               <li><strong>Code Reusability:</strong> Higher-order functions allow you to encapsulate common patterns and behaviors, making it easier to reuse code across different parts of your application.</li>
               <li><strong>Abstraction:</strong> Higher-order functions enable you to abstract away implementation details and focus on the higher-level logic of your program.</li>
               <li><strong>Composition:</strong> Higher-order functions promote code composition, allowing you to combine smaller functions to create more complex behavior.</li>
-            </ul>`
-        },
-        {
-            command: "This Keyword",
-            text: ` <p><strong>this Keyword:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "This Keyword",
+      text: ` <p><strong>this Keyword:</strong></p>
             <ul>
               <li>In JavaScript, the <code>this</code> keyword refers to the context in which a function is executed.</li>
               <li>The value of <code>this</code> depends on how a function is called.</li>
               <li>In a global context or outside of any function, <code>this</code> refers to the global object (in the browser, it refers to the <code>window</code> object).</li>
               <li>Inside a function, <code>this</code> can refer to different objects depending on how the function is called.</li>
               <li>Arrow functions do not have their own <code>this</code> value. Instead, they inherit the <code>this</code> value from the enclosing lexical context (the enclosing non-arrow function).</li>
-            </ul>`
-        },
-        {
-            command: "Constructor",
-            text: `<p><strong>Constructors in JavaScript:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Constructor",
+      text: `<p><strong>Constructors in JavaScript:</strong></p>
             <ul>
               <li>A constructor is a special method in JavaScript that is automatically called when an instance of a class or object is created.</li>
               <li>Constructors are typically used to initialize object properties or perform any setup required when creating an instance of a class.</li>
               <li>In JavaScript, constructors are defined using the <code>constructor</code> method within a class.</li>
               <li>The <code>constructor</code> method is called with the <code>new</code> keyword to create a new instance of the class.</li>
               <li>Constructors can take parameters to customize the initialization of objects.</li>
-            </ul>`
-        },
-        {
-            command: "Polyfills",
-            text: `  <p><strong>Polyfills in JavaScript:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Polyfills",
+      text: `  <p><strong>Polyfills in JavaScript:</strong></p>
             <ul>
               <li>Polyfills are code snippets or libraries that provide modern JavaScript features to older browsers that do not support them natively.</li>
               <li>They are used to fill the "gaps" in browser support by implementing missing functionality using JavaScript code.</li>
@@ -2111,11 +2102,11 @@ const MainPage =() =>{
             <ul>
               <li>To use a polyfill, you typically include the polyfill script at the beginning of your JavaScript bundle or HTML document.</li>
               <li>Polyfills can be included individually for specific features or bundled together using tools like Polyfill.io.</li>
-            </ul>`
-        },
-        {
-            command: "Treeshaking",
-            text: ` <p><strong>Tree Shaking:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Treeshaking",
+      text: ` <p><strong>Tree Shaking:</strong></p>
             <ul>
               <li>Tree shaking is a technique used in modern JavaScript build tools, such as Webpack, to eliminate dead code from the final bundle.</li>
               <li>It works by analyzing the codebase and only including the code that is actually used, thus reducing the size of the bundle and improving performance.</li>
@@ -2142,38 +2133,38 @@ const MainPage =() =>{
               <li>Tree shaking works best with ES6 module syntax, as it allows for better static analysis of dependencies.</li>
               <li>Some code patterns, such as dynamic imports and CommonJS modules, may not be fully compatible with tree shaking.</li>
               <li>Regular maintenance of dependencies and keeping them up-to-date is essential to take advantage of the latest tree shaking optimizations.</li>
-            </ul>`
-        },
-        {
-            command: "Object.freeze()",
-            text: ` <p><strong>Object.freeze():</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Object.freeze()",
+      text: ` <p><strong>Object.freeze():</strong></p>
             <ul>
               <li><code>Object.freeze()</code> is a method in JavaScript that freezes an object, preventing new properties from being added to it, existing properties from being removed or changed, and preventing its prototype chain from being modified.</li>
               <li>Once an object is frozen, it becomes immutable.</li>
               <li>Attempts to modify a frozen object will be ignored, and an error will not be thrown in strict mode.</li>
               <li><code>Object.freeze()</code> is shallow, meaning it only freezes the immediate properties of the object and does not recursively freeze nested objects.</li>
-            </ul>`
-        },
-        {
-            command: "Debouncing",
-            text: ` <p><strong>Debouncing:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Debouncing",
+      text: ` <p><strong>Debouncing:</strong></p>
             <p>Debouncing is a technique used in JavaScript to ensure that a function is not executed until after a certain amount of time has passed since the last time it was invoked.</p>
             <p>It is commonly used in scenarios where a function is triggered repeatedly (e.g., user input events such as typing or scrolling) and you want to delay executing the function until the user has finished performing the action.</p>
             <p>Debouncing helps to improve performance and optimize resource usage by preventing excessive function calls.</p>
-        `
-        },
-        {
-            command: "Throttling",
-            text: `<p><strong>Throttling:</strong></p>
+        `,
+    },
+    {
+      command: "Throttling",
+      text: `<p><strong>Throttling:</strong></p>
             <p>Throttling is a technique used to limit the rate at which a function is invoked. It ensures that the function is not called more frequently than a specified threshold, typically to improve performance or prevent excessive resource consumption.</p>
         
             <p><strong>How Throttling Works:</strong></p>
             <p>When throttling a function, only the first invocation within the specified time interval (threshold) is executed immediately. Subsequent invocations that occur before the threshold has elapsed are ignored. Once the threshold has passed, the function becomes available for invocation again.</p>
-        `
-        },
-        {
-            command: "CORS",
-            text: ` <p><strong>CORS (Cross-Origin Resource Sharing):</strong></p>
+        `,
+    },
+    {
+      command: "CORS",
+      text: ` <p><strong>CORS (Cross-Origin Resource Sharing):</strong></p>
             <ul>
               <li>CORS is a security feature implemented by web browsers to restrict cross-origin HTTP requests that are initiated by scripts running on a webpage.</li>
               <li>It is a mechanism that allows servers to specify which origins are permitted to access their resources.</li>
@@ -2194,11 +2185,11 @@ const MainPage =() =>{
               <li>Fetching data from an API hosted on a different domain.</li>
               <li>Embedding resources (e.g., fonts, scripts) from external origins.</li>
               <li>Implementing cross-origin communication between web applications.</li>
-            </ul>`
-        },
-        {
-            command: "Real vs Virtual DOM",
-            text: ` <p><strong>Virtual DOM vs Real DOM:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "Real vs Virtual DOM",
+      text: ` <p><strong>Virtual DOM vs Real DOM:</strong></p>
             <ul>
               <li>The <strong>Real DOM</strong> (Document Object Model) is the actual tree structure of HTML elements created by the browser when a web page is loaded.</li>
               <li>The <strong>Virtual DOM</strong> is a lightweight copy of the Real DOM maintained by frameworks like React.</li>
@@ -2219,11 +2210,11 @@ const MainPage =() =>{
               <li>Building complex user interfaces with dynamic data and interactive components.</li>
               <li>Optimizing performance in web applications by reducing unnecessary DOM manipulations.</li>
               <li>Improving developer productivity by providing a high-level abstraction for working with the DOM.</li>
-            </ul>`
-        },
-        {
-            command: "React Mixins",
-            text: ` <p><strong>React Mixins:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "React Mixins",
+      text: ` <p><strong>React Mixins:</strong></p>
             <ul>
               <li>React mixins are a way to share reusable code between React components.</li>
               <li>They allow you to encapsulate logic and share it across multiple components without inheritance.</li>
@@ -2234,11 +2225,11 @@ const MainPage =() =>{
             <ul>
               <li>To use a mixin in a component, you need to include it using the <code>mixins</code> property in the component's definition.</li>
               <li>Once included, the methods and properties defined in the mixin become available to the component.</li>
-            </ul>`
-        },
-        {
-            command: "useReducer vs useRef",
-            text: `<p><strong>useReducer vs useRef:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "useReducer vs useRef",
+      text: `<p><strong>useReducer vs useRef:</strong></p>
             <p><strong>useReducer:</strong></p>
             <ul>
               <li><code>useReducer</code> is a hook used for managing complex state logic in React.</li>
@@ -2260,11 +2251,11 @@ const MainPage =() =>{
               <li><code>useReducer</code> is primarily used for managing state logic and performing state updates based on dispatched actions.</li>
               <li><code>useRef</code> is primarily used for accessing and persisting mutable values across renders, especially for values that should not trigger re-renders.</li>
               <li>While <code>useReducer</code> returns a state value and a dispatch function, <code>useRef</code> returns a mutable ref object.</li>
-            </ul>`
-        },
-        {
-          command: "error boundaries in react",
-          text: ` <p><strong>Error Boundaries in React:</strong></p>
+            </ul>`,
+    },
+    {
+      command: "error boundaries in react",
+      text: ` <p><strong>Error Boundaries in React:</strong></p>
           <ul>
             <li>Error boundaries are React components that catch JavaScript errors anywhere in their child component tree.</li>
             <li>They provide a way to gracefully handle errors and prevent the entire application from crashing.</li>
@@ -2274,11 +2265,11 @@ const MainPage =() =>{
             <li>Error boundaries only catch errors that occur in their own component tree. They do not catch errors in event handlers, asynchronous code (e.g., setTimeout or requestAnimationFrame callbacks), or during server-side rendering.</li>
             <li>You can define multiple error boundary components in your application to handle different sections of the UI.</li>
             <li>Error boundaries are useful for building robust and reliable React applications by gracefully handling errors and providing a better user experience.</li>
-          </ul>`
-        },
-        {
-          command: "Hooks in redux",
-          text: `<p><strong>Hooks in Redux:</strong></p>
+          </ul>`,
+    },
+    {
+      command: "Hooks in redux",
+      text: `<p><strong>Hooks in Redux:</strong></p>
           <p>React Redux provides hooks that allow you to interact with the Redux store and dispatch actions in functional components.</p>
       
           <p><strong>useSelector:</strong></p>
@@ -2293,22 +2284,22 @@ const MainPage =() =>{
             <li>The useDispatch hook allows you to dispatch actions to the Redux store in functional components.</li>
             <li>It returns a reference to the dispatch function provided by the Redux store.</li>
             <li>You can use this function to dispatch actions from anywhere in your functional components.</li>
-          </ul>`
-        },
-        {
-          command: "ways to copy object",
-          text: `<p><strong>Ways to Copy Objects in JavaScript:</strong></p>
+          </ul>`,
+    },
+    {
+      command: "ways to copy object",
+      text: `<p><strong>Ways to Copy Objects in JavaScript:</strong></p>
           <ol>
             <li><strong>Object.assign():</strong> Copies the values of all enumerable own properties from one or more source objects to a target object.</li>
             <li><strong>Spread Operator (...):</strong> Creates a shallow copy of an object by spreading its properties into a new object literal.</li>
             <li><strong>JSON.parse() and JSON.stringify():</strong> Converts an object to a JSON string and then parses the JSON string to create a deep copy of the object.</li>
             <li><strong>Object.create():</strong> Creates a new object with the specified prototype object and properties.</li>
             <li><strong>Looping through properties:</strong> Manually iterate over the properties of the object and copy them to a new object.</li>
-          </ol>`
-        },
-        {
-          command: "shallow copy and deep copy",
-          text: ` <p><strong>Shallow Copy:</strong></p>
+          </ol>`,
+    },
+    {
+      command: "shallow copy and deep copy",
+      text: ` <p><strong>Shallow Copy:</strong></p>
           <ul>
             <li>A shallow copy of an object creates a new object with the same top-level structure as the original object.</li>
             <li>However, the properties of the new object are references to the same objects as the properties of the original object.</li>
@@ -2328,11 +2319,11 @@ const MainPage =() =>{
           <ul>
             <li><strong>Shallow Copy:</strong> Useful when you only need a surface-level copy of an object and don't want to duplicate nested objects.</li>
             <li><strong>Deep Copy:</strong> Useful when you need to create a completely independent copy of an object, including all nested objects and properties.</li>
-          </ul>`
-        },
-        {
-          command:"Redux Thunk and redux Saga",
-          text: ` <p><strong>Redux Thunk:</strong></p>
+          </ul>`,
+    },
+    {
+      command: "Redux Thunk and redux Saga",
+      text: ` <p><strong>Redux Thunk:</strong></p>
           <ul>
             <li>Redux Thunk is a middleware for Redux that allows you to write asynchronous logic in Redux action creators.</li>
             <li>It enables action creators to return functions instead of plain action objects.</li>
@@ -2370,11 +2361,11 @@ const MainPage =() =>{
           <ul>
             <li><strong>Redux Thunk:</strong> Suitable for applications with simpler asynchronous logic, such as basic API calls and data fetching.</li>
             <li><strong>Redux Saga:</strong> Ideal for applications with complex asynchronous requirements, such as real-time updates, event handling, and advanced control flow.</li>
-          </ul>`
-        },
-        {
-          command: "Generator function",
-          text: `<p><strong>Generator Function in JavaScript:</strong></p>
+          </ul>`,
+    },
+    {
+      command: "Generator function",
+      text: `<p><strong>Generator Function in JavaScript:</strong></p>
           <ul>
             <li>A generator function is a special type of function in JavaScript that can be paused and resumed during its execution.</li>
             <li>It is defined using the function* syntax (with an asterisk after the function keyword).</li>
@@ -2382,11 +2373,11 @@ const MainPage =() =>{
             <li>When a generator function is called, it returns a generator object that can be iterated over using a for...of loop or by calling the next() method on the generator object.</li>
             <li>Each time the next() method is called on the generator object, the generator function resumes execution from the point where it was paused.</li>
             <li>Generator functions are useful for implementing custom iteration behavior, asynchronous programming, and lazy evaluation.</li>
-          </ul>`
-        },
-        {
-          command: "Css Grid and Flex",
-          text: `<p><strong>CSS Grid and Flexbox:</strong></p>
+          </ul>`,
+    },
+    {
+      command: "Css Grid and Flex",
+      text: `<p><strong>CSS Grid and Flexbox:</strong></p>
           <p>CSS Grid and Flexbox are two powerful layout systems in CSS that allow developers to create complex and responsive layouts with ease.</p>
       
           <p><strong>CSS Grid:</strong></p>
@@ -2414,10 +2405,11 @@ const MainPage =() =>{
           <ul>
             <li><strong>CSS Grid:</strong> Complex layouts, grid-based designs, magazine-style layouts.</li>
             <li><strong>Flexbox:</strong> Navigation menus, sidebars, flexible content containers, centering elements.</li>
-          </ul>`
-        },{
-          command:"Selection Sort Implementation",
-          text:`
+          </ul>`,
+    },
+    {
+      command: "Selection Sort Implementation",
+      text: `
           <p><strong>Selection Sort:</strong> Selection Sort is a sorting algorithm. It works by selecting the smallest (or largest) element from given array and swapping it with the element at the current position.</p>
         <p><strong>Time Complexity:</strong></p>
         <ul>
@@ -2446,10 +2438,11 @@ console.log(selectionSort(arr));
     </code>
 </pre>
 
-          `
-        },{
-  command: "Bubble Sort Implementation",
-  text: `
+          `,
+    },
+    {
+      command: "Bubble Sort Implementation",
+      text: `
       <p><strong>Bubble Sort:</strong> Bubble Sort is a simple sorting algorithm,it pushes the maximum element to the last by adjacent swaps.</p>
       <p><strong>Optimization:</strong> In the optimized version of Bubble Sort, we can stop early if no elements were swapped,indicating that the list is already sorted.</p>
       <p><strong>Time Complexity:</strong></p>
@@ -2492,10 +2485,11 @@ console.log(bubbleSort(arr));
 // Output: [10,18,20, 28, 55]
           </code>
       </pre>
-  `
-},{
-  command: "Insertion Sort Implementation",
-  text: `
+  `,
+    },
+    {
+      command: "Insertion Sort Implementation",
+      text: `
       <p><strong>Insertion Sort:</strong> Insertion Sort is a sorting algorithm it going to pick an element and kept at right position by swaping.</p>
       <p><strong>Why is Insertion Sort Efficient for Almost Sorted Arrays?</strong></p>
       <ul>
@@ -2533,369 +2527,407 @@ insertionSort(arr);
 // Output:[5,6,11,12,13]
             </code>
       </pre>
-  `
-}
+  `,
+    },
+  ];
 
-      ];
-    
-    
-    const {
-        listening,
-        browserSupportsContinuousListening
-      } = useSpeechRecognition();
-    const {
-        transcript,
-        resetTranscript,
-        browserSupportsSpeechRecognition
-      } = useSpeechRecognition({ commandss });
+  // const { listening, browserSupportsContinuousListening } =
+  //   useSpeechRecognition();
+  // const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
+  //   useSpeechRecognition({ commandss });
 
-      
+    const [text, setText] = useState("");
+    const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
+  useEffect(() => {
+    const userId = localStorage.getItem("userInfo");
+    //   const userId = Cookies.get("userInfo")
+    //   const userId = sessionStorage.getItem("userInfo");
+    if (!userId) {
+      navigate("/login");
+    }
+    if (userId) {
+      axios
+        .get("https://gallant-69c58-default-rtdb.firebaseio.com/users.json")
+        .then((response) => {
+          const fetchedData = response.data;
+          const userExisitingData = fetchedData[userId];
+          console.log(fetchedData);
 
-   
+          const name = userExisitingData?.firstname;
+          setuserName(name);
+        });
+    }
+  }, [navigate]);
 
-
-    useEffect(() => {
-        const userId = localStorage.getItem('userInfo');
-      //   const userId = Cookies.get("userInfo")
-      //   const userId = sessionStorage.getItem("userInfo");
-        if (!userId) {
-            navigate('/login');
-        }
-        if(userId){
-            axios.get("https://gallant-69c58-default-rtdb.firebaseio.com/users.json")
-                .then((response) => {
-                const fetchedData = response.data;
-                const userExisitingData = fetchedData[userId];
-                console.log(fetchedData)
-                
-                const name = userExisitingData?.firstname;
-                setuserName(name);
-                
-            })};
-
-        
-
-    }, [navigate]);
-
-
-
-   
-    const handleBeforeUnload = (event) => {
-      try {
-          const navigationTiming = performance.getEntriesByType('navigation')[0];
-          if (navigationTiming.type !== 'reload' && navigationTiming.type !== 'back_forward' && navigationTiming.type !== 'navigate') {
-            // If the page is being unloaded (i.e., the browser window is being closed), clear localStorage
-            localStorage.clear();
-        }
-      } catch (error) {
-          console.error('An error occurred:', error);
+  const handleBeforeUnload = (event) => {
+    try {
+      const navigationTiming = performance.getEntriesByType("navigation")[0];
+      if (
+        navigationTiming.type !== "reload" &&
+        navigationTiming.type !== "back_forward" &&
+        navigationTiming.type !== "navigate"
+      ) {
+        // If the page is being unloaded (i.e., the browser window is being closed), clear localStorage
+        localStorage.clear();
       }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  const chatRef = ref(database, `text${userId}`);
+  set(chatRef, { transcript })
+    .then(() => {
+      console.log("Added Successfully to Firebase");
+    })
+    .catch((error) => {
+      console.error("Error adding data to Firebase: ", error);
+    });
+
+  const filteredCommands =
+    commandss?.filter((command) =>
+      command.command.toLowerCase().includes(searchInput.toLowerCase())
+    ) || commandss;
+
+  const handleSignOut = () => {
+    const user = localStorage.getItem("userInfo");
+    if (user) {
+      localStorage.removeItem("userInfo");
+      navigate("/login");
+    }
+  };
+
+  const formatTextToHTML = (text) => {
+    let sentences = text.split(/[.\n]+/).filter(Boolean);
+    let formattedHTML = `<ul>${sentences.map(sentence => `<li>${sentence.trim()}</li>`).join("")}</ul>`;
+    return formattedHTML;
+  };
+
+  // const handleSendButton =() => {
+  //   handleResetMicData()
+  //   const chatInputData = text || transcript ;
+  //   setButtonsPopUp(true);
+  //   if (userId && chatInputData.trim() !== "") {
+  //     const chatRef = ref(database, `data${userId}`);
+  //     set(chatRef, { chatInputData })
+  //       .then(() => {})
+  //       .catch((error) => {
+  //         console.error("Error adding data to Firebase: ", error);
+  //       });
+  //   }
+  //   SpeechRecognition.stopListening()
+  //   setTimeout(() => {
+  //     setButtonsPopUp(false);
+  //   }, 600);
+  // };
+
+  const handleSendButton = () => {
+    handleResetMicData();
+    let chatInputData = text || transcript;
   
-  window.addEventListener('beforeunload', handleBeforeUnload);
-
-
-
-
-
-
-    const chatRef = ref(database, `text${userId}`); // Assuming 'chat' is the path where you want to store chat data
-            set(chatRef, { transcript }) // Using push() to generate unique keys
-                .then(() => {
-                    console.log("Added Successfully to Firebase")
-                }).catch(error => {
-                    console.error("Error adding data to Firebase: ", error);
-                });
-
-    const filteredCommands = commandss?.filter(command => command.command.toLowerCase().includes(searchInput.toLowerCase())) || commandss
-
-    const handleSignOut = () => {
-         const user = localStorage.getItem('userInfo');
-         // const user = Cookies.get("userInfo");
-         // const user = sessionStorage.getItem("userInfo");
-         if(user){
-            localStorage.removeItem('userInfo')
-            // Cookies.remove("userInfo");
-            // sessionStorage.removeItem("userInfo")
-            navigate("/login")
-         }
+    // Function to check if string contains HTML tags
+    const containsHTML = (str) => /<\/?[a-z][\s\S]*>/i.test(str);
+  
+    // If 'text' is plain, convert it into structured HTML
+    if (!containsHTML(text) && text) {
+      chatInputData = formatTextToHTML(text);
     }
-
-
-      const handleSendButton = () => {
-        const chatInputData = chatInput; // Assuming you have the chat input available
-        setButtonsPopUp(true)
-        if(userId && chatInputData.trim() !== ""){
-            const chatRef = ref(database, `data${userId}`); // Assuming 'chat' is the path where you want to store chat data
-            set(chatRef, { chatInputData }) // Using push() to generate unique keys
-                .then(() => {
-                }).catch(error => {
-                    console.error("Error adding data to Firebase: ", error);
-                });
-        }
-        setTimeout(() => {
-         setButtonsPopUp(false);
-       },600);
+  
+    setButtonsPopUp(true);
+  
+    if (userId && chatInputData.trim() !== "") {
+      const chatRef = ref(database, `data${userId}`);
+      set(chatRef, { chatInputData })
+        .then(() => {})
+        .catch((error) => {
+          console.error("Error adding data to Firebase: ", error);
+        });
     }
+  
+    SpeechRecognition.stopListening();
+    setTimeout(() => {
+      setButtonsPopUp(false);
+    }, 600);
+  };
+
+  const handleResetButton = () => {
+    const chatRef = ref(database, `data${userId}`);
+    set(chatRef, { chatInputData: "" })
+      .then(() => {
+        setText("");
+        resetTranscript();
+      })
+      .catch((error) => {
+        console.error("Error adding data to Firebase: ", error);
+      });
+  };
+
+  const handleResetMicData = () => {
+    const chatRef = ref(database, `text${userId}`);
+    set(chatRef, { transcript:"" })
+    .then(() => {
+      resetTranscript();
+    })
+    .catch((error) => {
+      console.error("Error adding data to Firebase: ", error);
+    });
+  }
+
+  const handleResetTypeData = () => {
+    const chatRef = ref(database, `data${userId}`);
+    set(chatRef, { chatInputData: "" })
+      .then(() => {
+        setText("");
+      })
+      .catch((error) => {
+        console.error("Error adding data to Firebase: ", error);
+      });
+  }
 
 
-    const handleResetButton = () => {
-        const chatRef = ref(database, `data${userId}`); // Assuming 'chat' is the path where you want to store chat data
-            set(chatRef, { chatInputData:'' }) // Using push() to generate unique keys
-                .then(() => {
-                    setChatInput("")
-                }).catch(error => {
-                    console.error("Error adding data to Firebase: ", error);
-                });
-   
-    }
-    const handleGenerateLink = () => {
-        if (userId) {
-            const url = window.location.href;
-            console.log(url)
-            const containsHash = url.includes('#');
-            const urlMain = url.split("#")[0]
-            const domain = window.location.hostname; // Get the hostname (domain name)
-           let userLink
-            if(containsHash){
-                userLink = domain === 'localhost' ? `http://localhost:3000/mainPage#/user/${userId}` : `${urlMain}#/user/${userId}` ;
 
-            } else{
-                 userLink = domain === 'localhost' ? `http://localhost:3000/user/${userId}` : `https://${domain}/user/${userId}` ;
-            }
-            setUserLink(userLink);
-            setGenPopUp(true);
-          }
-    }
-    const handleClosePopup = () => {
-        setGenPopUp(false);
-        setLinkCopied(false)
-        setIsOpen(false)
-      
-      };
 
-    const handleCommand = (item) => {
-       setChatInput(item.text)
+
+  const handleGenerateLink = () => {
+    if (userId) {
+      const url = window.location.href;
+      console.log(url);
+      const containsHash = url.includes("#");
+      const urlMain = url.split("#")[0];
+      const domain = window.location.hostname;
+      let userLink;
+      if (containsHash) {
+        userLink =
+          domain === "localhost"
+            ? `http://localhost:3000/mainPage#/user/${userId}`
+            : `${urlMain}#/user/${userId}`;
+      } else {
+        userLink =
+          domain === "localhost"
+            ? `http://localhost:3000/user/${userId}`
+            : `https://${domain}/user/${userId}`;
       }
-      const copyToClipboard = () => {
-        navigator.clipboard.writeText(userLink)
-            .then(() => {
-                setLinkCopied(true)
-                // Optionally, you can show a notification or update state to indicate that the link is copied
-            })
-            .catch((error) => {
-                console.error('Error copying link to clipboard:', error);
-            });
-    };
-    const togglePopup = () => {
-        setIsOpen(!isOpen)
+      setUserLink(userLink);
+      setGenPopUp(true);
     }
+  };
+
+  const handleClosePopup = () => {
+    setGenPopUp(false);
+    setLinkCopied(false);
+    setIsOpen(false);
+  };
+
+  const handleCommand = (item) => {
+    setText(item.text);
+  };
 
 
-  
+  const copyToClipboard = () => {
+    navigator.clipboard
+      .writeText(userLink)
+      .then(() => {
+        setLinkCopied(true);
+      })
+      .catch((error) => {
+        console.error("Error copying link to clipboard:", error);
+      });
+  };
 
-    const saveTranscript = (trans) => {
-        saveTranscript(trans);
-        console.log(trans);
-    }
+  const togglePopup = () => {
+    setIsOpen(!isOpen);
+  };
 
+  const saveTranscript = (trans) => {
+    saveTranscript(trans);
+    console.log(trans);
+  };
 
+  const handleStartButton = () => {
+    SpeechRecognition.startListening({
+      continuous: true,
+      language: "en-IN",
+    });
+    setIsRecording(true);
+  };
 
+  const handleStopButton = () => {
+    SpeechRecognition.stopListening();
+    setIsRecording(false);
+  };
 
+  const handleStartListening = () => {
+    setText("")
+    resetTranscript(); // Clear previous transcript
+    handleResetTypeData()
+    SpeechRecognition.startListening({ continuous: true, language: "en-US" });
+  };
 
-//     const handleUserDataClearBtn = () => {
-//       // Clearing the local state for user form data
-//       setUserFormData({
-//           companyName: '',
-//           payroleName: '',
-//           to: '',
-//           from: '',
-//           experiences: '',
-//           experiencesRelevant: '',
-//           currentCTC: '',
-//           expectedCTC: ''
-//       });
-  
-//       // Instead of updating the entire user data to an empty object, only clear the specific fields in the database
-//       const userDataRef = ref(database, `userDataInfo${userId}`);
-//       set(userDataRef.child('userFormData'), {})
-//           .then(() => {
-//               console.log("Cleared userFormData in Firebase");
-//           })
-//           .catch(error => {
-//               console.error("Error clearing userFormData in Firebase: ", error);
-//           });
-//   }
+  return (
+    <div className="mainPageBackgroundContainer">
+      <div className="mainPleftSectionContainer">
+        <h1 className="CommandBoxHeading">Questions</h1>
+        <div class="search-container">
+          <input
+            type="search"
+            placeholder="Search"
+            class="search-input"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+          <button type="button" class="search-button">
+            <BsSearch className="search-icon" />
+          </button>
+        </div>
+        <div className="CommandsContainer" style={{ overflowY: "scroll" }}>
+          {filteredCommands?.map((item) => (
+            <li
+              style={{ cursor: "pointer" }}
+              onClick={() => handleCommand(item)}
+            >
+              {item.command}
+            </li>
+          ))}
+        </div>
+      </div>
+      <div className="mainPrightSectionContainer">
+        <div className="mainPrightSectionTopBar">
+          <h1 className="appTitle">Gallant</h1>
+          <div className="mainPrightSectionTopBarInfo">
+            {/* <MdPerson className="logIcon" /> */}
+            {/* <h3 className="loginPName">{`${userName
+              ?.slice(0, 1)
+              .toUpperCase()}${userName?.slice(1)}`}</h3> */}
+            <button onClick={handleSignOut} className="signoutButton">
+              Sign Out
+            </button>
+          </div>
+        </div>
 
-
-
-//   const handleUserDataClearBtn = () => {
-//    const userDataRef = ref(database, `userDataInfo${userId}`);
-//    set(userDataRef, {}) // Clear the entire userDataInfo node
-//        .then(() => {
-//            console.log("Cleared userDataInfo in Firebase");
-//            // After successfully clearing Firebase data, update local state
-//            setUserFormData({
-//                companyName: '',
-//                payroleName: '',
-//                to: '',
-//                from: '',
-//                experiences: '',
-//                experiencesRelevant: '',
-//                currentCTC: '',
-//                expectedCTC: ''
-//            });
-//        })
-//        .catch(error => {
-//            console.error("Error clearing userDataInfo in Firebase: ", error);
-//        });
-// }
-
-
-const handleStartButton = () => {
-   SpeechRecognition.startListening({
-     continuous: true,
-     language: "en-IN"
-   });
-   setIsRecording(true);
- };
-
- const handleStopButton = () => {
-   SpeechRecognition.stopListening();
-   setIsRecording(false);
- };
-
-  
-   
-    return (
-        <div className="mainPageBackgroundContainer">
-            <div className="mainPleftSectionContainer">
-            <h1 className="CommandBoxHeading">Commands</h1>
-                    <div class="search-container">
-                        <input type="search" placeholder="Search" class="search-input" value={searchInput}  onChange={(e) => setSearchInput(e.target.value)} />
-                        <button type="button" class="search-button">
-                        <BsSearch className="search-icon" />
-                        </button>
-                    </div>
-                <div className="CommandsContainer" style={{overflowY:"scroll"}}>
-                   
-                    {/* {filteredCommands.map((category, index) => (
-                        <details key={index}>
-                            <summary>{category.category}</summary>
-                            <ul>
-                                {category.commands.map((command, idx) => (
-                                    <li key={idx}>{command}</li>
-                                ))}
-                            </ul>
-                        </details>
-                    ))} */}
-                    {
-                        filteredCommands?.map(item => <li style={{cursor:'pointer'}} onClick={()=>handleCommand(item)}>{item.command}</li>)
-                    }
-                    
-
-                </div>
-               
-
-               
-                
-                
+        <div className="rightSectionBottomContainer">
+          <div
+            className="MobileCommandsContainer"
+            style={{ height: "150px", display: "flex", flexDirection: "column" }}
+          >
+            <div class="search-container-mobile">
+              <input
+                type="search"
+                placeholder="Search"
+                className="search-input"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
             </div>
-            <div className='mainPrightSectionContainer'>
-          
-               <div className='mainPrightSectionTopBar'>
-               <h1 className="appTitle">Gallant</h1>
-               <div className='mainPrightSectionTopBarInfo'>
-                <MdPerson className='logIcon' />
-                <h3 className="loginPName">{`${userName?.slice(0,1).toUpperCase()}${userName?.slice(1)}`}</h3>
-                <button onClick={handleSignOut} className="signoutButton">Sign Out</button>
-               </div>
+            <ul className="questions">
+            {filteredCommands?.map((item) => (
+              <li
+                style={{ cursor: "pointer" }}
+                onClick={() => handleCommand(item)}
+              >
+                {item.command}
+              </li>
+            ))}
+            </ul>
+          </div>
+          {/* <textarea
+            placeholder="Mic"
+            type="text"
+            className="mainPtopInputContainer"
+            value={transcript}
+          /> */}
 
-               </div>
-
-               <div className="rightSectionBottomContainer">
-               <div className="MobileCommandsContainer" style={{overflowY:"scroll", height:'400px'}}>
-                    <h1 className="CommandBoxHeading">Commands</h1>
-                    <div class="search-container">
-                        <input type="search" placeholder="Search" class="search-input" value={searchInput}  onChange={(e) => setSearchInput(e.target.value)} />
-                        <button type="button" class="search-button">
-
-                        <BsSearch className="search-icon" />
-                        </button>
-                    </div>
-                    {/* {filteredCommands.map((category, index) => (
-                        <details key={index}>
-                            <summary>{category.category}</summary>
-                            <ul>
-                                {category.commands.map((command, idx) => (
-                                    <li key={idx}>{command}</li>
-                                ))}
-                            </ul>
-                        </details>
-                    ))} */}
-                    {
-                        filteredCommands?.map(item => <li style={{cursor:'pointer'}} onClick={()=>handleCommand(item)}>{item.command}</li>)
-
-                    }
-
-
-                </div>
-                  {/* <textarea placeholder='Mic' type="text" className='mainPtopInputContainer' value={transcript}/> */}
-                  <textarea placeholder='Mic' type="text" className='mainPtopInputContainer' value={transcript} />
+          <div className="btnTextContainer">
+            {isRecording && (
+              <div className="recordingIndicator">
+                Recording<span className="blink">...</span>
+              </div>
+            )}
+            {/* <div className="mainPbuttonsContainer">
+              <button
+                className="startButton button"
+                onClick={handleStartButton}
+              >
+                Start
+              </button>
+              <button className="stopButton button" onClick={handleStopButton}>
+                Stop
+              </button>
+              <button className="resetButton button" onClick={resetTranscript}>
+                Reset
+              </button>
+            </div> */}
+          </div>
+          <textarea
+            value={text || transcript}
+            placeholder="Type or Speak..."
+            type="text"
+            className="mainPbottomInputContainer"
+            onChange={(e) => setText(e.target.value)}
+          />
+          <div className="mainPbuttonsContainer">
+            {listening ?
+            <button className="startButton button" onClick={SpeechRecognition.stopListening}>Stop Listening</button>
            
-           <div className='btnTextContainer'>
-                {isRecording &&   <div className="recordingIndicator">
-            Recording<span className="blink">...</span>
-          </div> }
-                  <div className="mainPbuttonsContainer">
-                    <button className="startButton button" onClick={handleStartButton}>Start</button>
-                    <button className="stopButton button"  onClick={handleStopButton}>Stop</button>
-                    <button className="resetButton button" onClick={resetTranscript}>Reset</button>
-                  </div>
-            </div>
-                  <textarea value={chatInput} placeholder='Chat' type="text" className='mainPbottomInputContainer' onChange={(e) => setChatInput(e.target.value)} />
-                  <div className='mainPbuttonsContainer'>
-                    <button id="sendButton" onClick={handleSendButton} className='stopButton button'>Send</button>
-                    {buttonsPopUp && <div className="popup" id="popup" >Chat Sent !</div>}
-                    <button onClick={handleResetButton} className="resetButton button">Reset</button>
-                  </div>
-               </div>
-            <div className='generateLink'>
-            <button className="generate button" 
-        onClick={handleGenerateLink}
-        
-                    >Generate Link</button>
-          
-
-            </div>
-            {genPopUp && (
-        <div>
-        <div className="overlay" onClick={handleClosePopup}></div>
-        <div className='generateLinkPop'>
-            <h2>Use Below Link to see the Transcript</h2>
-            <div className="linkContainer">
-            <p className='userLink'>
-    {userLink}
-    <span className="copyIcon" onClick={copyToClipboard} title="Click here to copy">📋</span>
-</p>
-
-            </div>
-            {linkCopied && <p>Link copied!</p>}
-            <button onClick={handleClosePopup}>Close</button>
-        </div>
-    </div>
-    
-
-    
-      )}
-     
-             
-            </div>
+            :
+            <button
+            onClick={handleStartListening}
+            className="startButton button"
+            >
+             Listen
+            </button>
             
-
+            }
+           
+            <button
+              id="sendButton"
+              onClick={handleSendButton}
+              className="stopButton button"
+            >
+              Send
+            </button>
+            {buttonsPopUp && (
+              <div className="popup" id="popup">
+                Chat Sent !
+              </div>
+            )}
+            <button onClick={handleResetButton} className="resetButton button">
+              Reset
+            </button>
+          </div>
         </div>
-    )
-}
+        <div className="generateLink">
+          <button className="generate button" onClick={handleGenerateLink}>
+            Generate Link
+          </button>
+        </div>
+        {genPopUp && (
+          <div>
+            <div className="overlay" onClick={handleClosePopup}></div>
+            <div className="generateLinkPop">
+              <h2>Use Below Link :-</h2>
+              <div className="linkContainer">
+                <p className="userLink">
+                  {userLink}
+                  <span
+                    className="copyIcon"
+                    onClick={copyToClipboard}
+                    title="Click here to copy"
+                  >
+                    📋
+                  </span>
+                </p>
+              </div>
+              {linkCopied && <p>Link copied!</p>}
+              <button onClick={handleClosePopup}>Close</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default MainPage;

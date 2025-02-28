@@ -56,7 +56,7 @@ const UserPage =() =>{
  
     return (
         <div className="mainBackgroundContainer">
-            <div className='rightSectionContainer' style={{marginTop:"-50px"}}>
+            <div className='rightSectionContainer' style={{marginTop:"2px"}}>
               
               {/* <div className="mobileUserInfoContainer">
                  <div className="mobileeachuserInfocont">
@@ -98,20 +98,27 @@ const UserPage =() =>{
               </div> */}
                
 
-               <div className="rightSectionBottomContainer">
-               <div style={{ marginTop:'0px'}}> 
-      <h2>Data from Mic:</h2> 
+              
+               {/* <div style={{ marginTop:'0px'}}>  */}
+      {/* <h2>Data from Mic:</h2> 
     <div style={{border:"1px solid red", padding:'10px', minHeight:'150px',fontSize:"18px"}}> {dataFromDatabaseMic}</div>
       <h2>Data from Chat</h2>
     <div style={{border:"1px solid red", padding:'10px', minHeight:'350px', fontSize:"18px"}} dangerouslySetInnerHTML={{ __html: dataFromDatabase }}/>
-    </div>
+     */}
+
+{/* <div style={{ border: "1px solid red", padding: "10px",fontSize: "18px",}}> */}
+  {dataFromDatabaseMic && <p>{dataFromDatabaseMic}</p>}
+  {dataFromDatabase && <p><span dangerouslySetInnerHTML={{ __html: dataFromDatabase }} /></p>}
+{/* </div> */}
+
+    
+    {/* </div> */}
 
                   {/* <textarea placeholder="Mic" type="text" className='topInputContainer' />
                   
                   <textarea value={dataFromDatabase} placeholder="Chat" type="text" className='bottomInputContainer' /> */}
                   
-               </div>
-                
+              
             </div>
             
 
