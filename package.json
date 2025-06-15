@@ -2,7 +2,6 @@
   "name": "ownapp",
   "version": "0.1.0",
   "private": true,
-"homepage": "https://gallant728.github.io/worknew",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -23,7 +22,7 @@
 "scripts": {
     "start": "react-scripts start",
     "test": "react-scripts test",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "build": "react-scripts build",
     "build:prod": "npm run build && npm run optimize",
     "optimize": "npx terser build/static/js/*.js --compress --mangle --output-dir build/static/js/"
   },
