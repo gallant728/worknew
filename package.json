@@ -24,7 +24,7 @@
     "test": "react-scripts test",
     "build": "react-scripts build",
     "build:prod": "npm run build && npm run optimize",
-    "optimize": "npx terser build/static/js/*.js --compress --mangle --output-dir build/static/js/"
+    "optimize": "npx terser build/static/js/*.js --compress --mangle --output-dir build/static/js/ && npx cleancss-cli build/static/css/*.css --output-dir build/static/css/"
   },
   "eslintConfig": {
     "extends": [
